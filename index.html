@@ -972,8 +972,7 @@
         <span>Telecoms</span>
       </a>
       <div class="tabs">
-        <button class="tab-btn active" data-tab="TODOS">Ver todos</button>
-        <button class="tab-btn" data-tab="MOVEL">Móvel</button>
+        <button class="tab-btn active" data-tab="MOVEL">Móvel</button>
         <button class="tab-btn" data-tab="NET">Net</button>
         <button class="tab-btn" data-tab="NET_MOVEL">Net + Móvel</button>
         <button class="tab-btn" data-tab="TV_NET_VOZ">TV + Net + Voz</button>
@@ -986,8 +985,8 @@
     <div class="container hero-inner">
       <div class="hero-copy">
         <div class="eyebrow">Comparador independente</div>
-        <h1 id="titulo-pagina">Encontra o melhor pacote para casa</h1>
-        <p id="descricao-pagina">Compara fibra, televisão e móvel pelas características e mensalidade.</p>
+        <h1 id="titulo-pagina">Encontra o melhor tarifário móvel</h1>
+        <p id="descricao-pagina">Compara dados, chamadas e custos reais sem complicações.</p>
       </div>
       <aside class="trust-panel" aria-label="Informação de transparência">
         <div class="trust-row"><span class="trust-icon">✓</span>Sem publicidade patrocinada</div>
@@ -1032,7 +1031,7 @@
           </div>
         </div>
       </div>
-      <div class="campo" id="campo-fibra">
+      <div class="campo oculto" id="campo-fibra">
         <label for="filtro-fibra">Velocidade mínima</label>
         <select id="filtro-fibra">
           <option value="0">Qualquer</option>
@@ -1054,7 +1053,7 @@
           <option value="ILIMITADO">Ilimitado</option>
         </select>
       </div>
-      <div class="campo" id="campo-tv">
+      <div class="campo oculto" id="campo-tv">
         <label for="filtro-tv">Televisão</label>
         <select id="filtro-tv">
           <option value="TODOS">Com ou sem TV</option>
@@ -1117,7 +1116,7 @@
   <script>
     let todosTarifarios = [];
 
-    let tabAtiva = "TODOS";
+    let tabAtiva = "MOVEL";
     let ordenacoesTabela = [{ chave: "MENSALIDADE", direcao: "ASC" }];
     const tarifariosSelecionados = new Set();
 
@@ -1167,7 +1166,6 @@
 
       const resultados = todosTarifarios
         .filter(t => {
-          if (tabAtiva === "TODOS") return true;
           if (Array.isArray(t.abas) && t.abas.length > 0) {
             return t.abas.includes(tabAtiva);
           }
