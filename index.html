@@ -1146,6 +1146,11 @@
       return match[2] === "mb" ? quantidade / 1000 : quantidade;
     }
 
+    function dadosIlimitados(item) {
+      return item.dados_gb == null ||
+        (Number(item.dados_gb) === 0 && /ilimitad/i.test(item.nome || ""));
+    }
+
     function valorChamadasSMS(item) {
       const textos = [item.minutos, item.sms].join(" ").toLowerCase();
       if (textos.includes("ilimit")) return Number.POSITIVE_INFINITY;
@@ -1184,8 +1189,8 @@
         })
         .filter(t => t.fibra_mbps >= fibraMin)
         .filter(t => dadosFiltro === "ILIMITADO"
-          ? t.dados_gb == null
-          : t.dados_gb == null ? dadosMin === 0 : t.dados_gb >= dadosMin)
+          ? dadosIlimitados(t)
+          : dadosIlimitados(t) ? dadosMin === 0 : t.dados_gb >= dadosMin)
         .filter(t => t.fidelizacao_meses == null || t.fidelizacao_meses <= fidMax)
         .filter(t => tvFiltro === "COM_TV" ? t.tv_canais > 0 : tvFiltro === "SEM_TV" ? t.tv_canais === 0 : true)
         .sort((a, b) => {
@@ -1196,8 +1201,8 @@
               valorA = a.fidelizacao_meses == null ? Number.POSITIVE_INFINITY : Number(a.fidelizacao_meses);
               valorB = b.fidelizacao_meses == null ? Number.POSITIVE_INFINITY : Number(b.fidelizacao_meses);
             } else if (regra.chave === "DADOS_NACIONAIS") {
-              valorA = a.dados_gb == null ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
-              valorB = b.dados_gb == null ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
+              valorA = dadosIlimitados(a) ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
+              valorB = dadosIlimitados(b) ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
             } else if (regra.chave === "DADOS_ROAMING") {
               valorA = valorDadosRoaming(a.dados_roaming);
               valorB = valorDadosRoaming(b.dados_roaming);
@@ -1205,8 +1210,8 @@
               valorA = valorChamadasSMS(a);
               valorB = valorChamadasSMS(b);
             } else if (regra.chave === "CARACTERISTICAS") {
-              valorA = a.dados_gb == null ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
-              valorB = b.dados_gb == null ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
+              valorA = dadosIlimitados(a) ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
+              valorB = dadosIlimitados(b) ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
             } else {
               valorA = Number(a.mensalidade_promo ?? a.mensalidade_base ?? 0);
               valorB = Number(b.mensalidade_promo ?? b.mensalidade_base ?? 0);
@@ -1236,8 +1241,8 @@
               <tr>
                 <th>Tarifário</th>
                 ${tabAtiva === "MOVEL"
-                  ? `<th><button class="table-sort" type="button" data-sort="DADOS_NACIONAIS">Nacionais <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
-                     <th><button class="table-sort" type="button" data-sort="DADOS_ROAMING">Roaming <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
+                  ? `<th><button class="table-sort" type="button" data-sort="DADOS_NACIONAIS">Dados móveis nacionais <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
+                     <th><button class="table-sort" type="button" data-sort="DADOS_ROAMING">Dados móveis roaming <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
                      <th><button class="table-sort" type="button" data-sort="CHAMADAS_SMS">Chamadas/SMS <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`
                   : `<th><button class="table-sort" type="button" data-sort="CARACTERISTICAS">Características <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`}
                 <th><button class="table-sort" type="button" data-sort="FIDELIZACAO">Fidelização <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
@@ -1291,7 +1296,7 @@
           ? `<br>Oferta/voucher: −${item.oferta_voucher.toFixed(2).replace(".", ",")} €`
           : "";
 
-        const dadosTexto = item.dados_gb == null ? "Ilimitado" : item.dados_gb + " GB";
+        const dadosTexto = dadosIlimitados(item) ? "Ilimitado" : item.dados_gb + " GB";
         const fonteSegura = linkSeguroTarifario(item.fonte);
         const tituloTarifario = fonteSegura
           ? `<a class="pacote-titulo-link" href="${fonteSegura}" target="_blank" rel="noopener noreferrer">${item.nome}</a>`
@@ -1300,7 +1305,7 @@
           ? ""
           : `<span class="tariff-feature">Fibra ${item.fibra_mbps >= 1000 ? (item.fibra_mbps === 10000 ? "10 Gbps" : "1 Gbps") : item.fibra_mbps + " Mbps"}</span>
              <span class="tariff-feature-muted">${item.tv_canais > 0 ? item.tv_canais + " canais TV" : "Sem TV"}</span>
-             <span class="tariff-feature-muted">${item.cartoes_moveis || 0} cartão${Number(item.cartoes_moveis) === 1 ? "" : "s"} móvel${item.dados_gb != null && item.dados_gb > 0 ? " · " + item.dados_gb + " GB" : ""}</span>`;
+             <span class="tariff-feature-muted">${item.cartoes_moveis || 0} cartão${Number(item.cartoes_moveis) === 1 ? "" : "s"} móvel${dadosIlimitados(item) ? " · Ilimitado" : item.dados_gb > 0 ? " · " + item.dados_gb + " GB" : ""}</span>`;
         const fidelizacao = item.fidelizacao_meses == null
           ? "Não confirmada"
           : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses";
@@ -1519,7 +1524,7 @@
 
     function abrirDetalhes(item) {
       const euros = valor => Number(valor || 0).toFixed(2).replace(".", ",") + " €";
-      const dados = item.dados_gb == null ? "Ilimitados" : item.dados_gb + " GB";
+      const dados = dadosIlimitados(item) ? "Ilimitado" : item.dados_gb + " GB";
       const fidelizacao = item.fidelizacao_meses == null
         ? "Não confirmada"
         : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses";
@@ -1558,8 +1563,8 @@
           </th>
           <td>${Number(t.mensalidade_promo ?? t.mensalidade_base ?? 0).toFixed(2).replace(".", ",")} €/mês</td>
           <td>
-            ${t.dados_gb == null ? "Dados ilimitados" : t.dados_gb > 0 ? t.dados_gb + " GB nacionais" : "—"}
-            ${t.dados_gb != null && t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + t.dados_roaming + "</span>" : ""}
+            ${dadosIlimitados(t) ? "Ilimitado" : t.dados_gb > 0 ? t.dados_gb + " GB" : "—"}
+            ${!dadosIlimitados(t) && t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + t.dados_roaming + "</span>" : ""}
           </td>
           <td>${t.minutos || "—"}</td>
           <td>${t.sms || "—"}</td>

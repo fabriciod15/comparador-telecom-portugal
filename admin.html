@@ -32,6 +32,11 @@
     .tab-options { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px; }
     .tab-options label { flex-direction:row; align-items:center; }
     .tab-options input { width:16px; height:16px; }
+    .data-options { grid-column:1/-1; display:flex; flex-direction:column; gap:8px; }
+    .data-mode { display:flex; flex-wrap:wrap; gap:12px; }
+    .data-mode label { flex-direction:row; align-items:center; }
+    .data-mode input { width:16px; height:16px; }
+    .data-gb.oculto { display:none; }
     .card-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
     .status { min-height:20px; margin-top:10px; color:var(--muted); font-size:13px; }
     .status.error { color:var(--danger); }
@@ -105,6 +110,23 @@
       return `<label>${label}<input type="text" data-key="${key}" value="${String(value ?? "").replace(/"/g,"&quot;")}"></label>`;
     }
 
+    function dataField(item, index) {
+      const ilimitado = item.dados_gb == null ||
+        (Number(item.dados_gb) === 0 && /ilimitad/i.test(item.nome || ""));
+      return `
+        <div class="data-options">
+          <strong>Dados móveis nacionais</strong>
+          <div class="data-mode">
+            <label><input type="radio" name="dados-mode-${index}" data-dados-mode="LIMITADO" ${ilimitado ? "" : "checked"}> Limitados</label>
+            <label><input type="radio" name="dados-mode-${index}" data-dados-mode="ILIMITADO" ${ilimitado ? "checked" : ""}> Ilimitado</label>
+          </div>
+          <label class="data-gb ${ilimitado ? "oculto" : ""}">Dados nacionais GB
+            <input type="number" step="any" data-key="dados_gb" value="${ilimitado ? 0 : (item.dados_gb ?? 0)}">
+          </label>
+        </div>
+      `;
+    }
+
     function inferTabs(item) {
       const services = Array.isArray(item.servicos) ? item.servicos : [];
       const tabs = [];
@@ -130,7 +152,7 @@
             ${numberField("Fibra Mbps","fibra_mbps",item.fibra_mbps)}
             ${numberField("Canais TV","tv_canais",item.tv_canais)}
             ${numberField("Cartões móveis","cartoes_moveis",item.cartoes_moveis)}
-            ${numberField("Dados nacionais GB","dados_gb",item.dados_gb)}
+            ${dataField(item,index)}
             ${textField("Dados roaming UE","dados_roaming",item.dados_roaming)}
             ${textField("Minutos","minutos",item.minutos)}
             ${textField("SMS","sms",item.sms)}
@@ -173,9 +195,13 @@
         const index = Number(card.dataset.index);
         [...card.querySelectorAll("[data-key]")].forEach(field => {
           const value = field.value;
-          const numberFields = ["fibra_mbps","tv_canais","cartoes_moveis","dados_gb","fidelizacao_meses","mensalidade_base","mensalidade_promo","meses_promo","custo_instalacao","oferta_voucher"];
+          const numberFields = ["fibra_mbps","tv_canais","cartoes_moveis","fidelizacao_meses","mensalidade_base","mensalidade_promo","meses_promo","custo_instalacao","oferta_voucher"];
+          if (field.dataset.key === "dados_gb") return;
           tariffs[index][field.dataset.key] = numberFields.includes(field.dataset.key) ? Number(value) : value;
         });
+        const dadosUnlimited = card.querySelector("[data-dados-mode]:checked")?.dataset.dadosMode === "ILIMITADO";
+        const dadosGbField = card.querySelector('[data-key="dados_gb"]');
+        tariffs[index].dados_gb = dadosUnlimited ? null : Number(dadosGbField?.value ?? 0);
         tariffs[index].servicos = [...card.querySelectorAll("[data-service]:checked")].map(field => field.dataset.service);
         tariffs[index].abas = [...card.querySelectorAll("[data-aba]:checked")].map(field => field.dataset.aba);
         const selected = card.querySelector("[data-cliente]:checked")?.dataset.cliente || "TODOS";
@@ -234,7 +260,7 @@
     });
     document.getElementById("add").addEventListener("click", () => {
       collect();
-      tariffs.push({ categoria:"CASA",servicos:["NET"],abas:["NET"],clientes:["NOVOS","ATUAIS"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fonte:"",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:0,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
+      tariffs.push({ categoria:"CASA",servicos:["NET"],abas:["NET"],clientes:["NOVOS","ATUAIS"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fonte:"",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:null,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
       render();
     });
     document.getElementById("cards").addEventListener("click", event => {
@@ -242,6 +268,12 @@
       collect();
       tariffs.splice(Number(event.target.dataset.delete),1);
       render();
+    });
+    document.getElementById("cards").addEventListener("change", event => {
+      if (!event.target.matches("[data-dados-mode]")) return;
+      const card = event.target.closest(".card");
+      const gbField = card.querySelector(".data-gb");
+      gbField.classList.toggle("oculto", event.target.dataset.dadosMode === "ILIMITADO");
     });
     document.getElementById("save-local").addEventListener("click", () => {
       collect();
