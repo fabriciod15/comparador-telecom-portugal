@@ -829,10 +829,19 @@
       min-width: 210px;
     }
 
-    .tariff-name .selo-vencedor {
+    .tariff-badges {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .tariff-badges .op-badge,
+    .tariff-badges .selo-vencedor {
       position: static;
       display: inline-block;
-      margin: 0 6px 7px 0;
+      margin: 0;
       text-transform: none;
       vertical-align: middle;
     }
@@ -1142,10 +1151,24 @@
     function valorDadosRoaming(valor) {
       const texto = String(valor || "").toLowerCase();
       if (texto.includes("ilimit")) return Number.POSITIVE_INFINITY;
-      const match = texto.match(/([0-9]+(?:[.,][0-9]+)?)\s*(gb|mb)/);
+      const match = texto.match(/([0-9]+(?:[.,][0-9]+)?)\s*(gb|mb)?/);
       if (!match) return 0;
       const quantidade = Number(match[1].replace(",", "."));
       return match[2] === "mb" ? quantidade / 1000 : quantidade;
+    }
+
+    function textoDadosRoaming(valor) {
+      const texto = String(valor ?? "").trim();
+      const normalizado = texto.toLowerCase();
+      if (!texto || ["—", "-", "não confirmado", "n/a"].includes(normalizado)) return "Não confirmado";
+      if (/ilimitad/i.test(texto)) return "Ilimitado";
+      if (/não inclui/i.test(texto)) return "Não inclui";
+      const match = texto.match(/([0-9]+(?:[.,][0-9]+)?)\s*(gb|mb)?/i);
+      if (!match) return texto;
+      const quantidade = Number(match[1].replace(",", "."));
+      if (quantidade === 0) return "Não inclui";
+      const gb = match[2]?.toLowerCase() === "mb" ? quantidade / 1000 : quantidade;
+      return `${gb.toLocaleString("pt-PT", { maximumFractionDigits: 3 })} GB`;
     }
 
     function dadosIlimitados(item) {
@@ -1318,17 +1341,17 @@
         const fidelizacao = item.fidelizacao_meses == null
           ? "Não confirmada"
           : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses";
-        const dadosRoaming = item.dados_roaming && String(item.dados_roaming).trim()
-          ? escaparHtml(item.dados_roaming)
-          : "Não confirmado";
+        const dadosRoaming = escaparHtml(textoDadosRoaming(item.dados_roaming));
         const chamadasSms = `
           <span class="tariff-feature">${escaparHtml(textoComunicacao(item.minutos, "min"))}</span>
           <span class="tariff-feature">${escaparHtml(textoComunicacao(item.sms, "SMS"))}</span>`;
 
         row.innerHTML =
           `<td class="tariff-name">
-             <span class="op-badge ${classeOp}">${escaparHtml(item.operadora)}</span>
-             ${index === 0 ? '<span class="selo-vencedor">Melhor preço</span>' : ""}
+             <div class="tariff-badges">
+               <span class="op-badge ${classeOp}">${escaparHtml(item.operadora)}</span>
+               ${index === 0 ? '<span class="selo-vencedor">Melhor preço</span>' : ""}
+             </div>
              <h2>${tituloTarifario}</h2>
              <div class="tariff-type">${escaparHtml(item.tipo)}</div>
            </td>
@@ -1547,7 +1570,7 @@
         <div class="detail-item"><strong>Cartões móveis</strong>${escaparHtml(item.cartoes_moveis ?? 0)}</div>
         <div class="detail-item"><strong>Minutos</strong>${escaparHtml(item.minutos)}</div>
         <div class="detail-item"><strong>SMS</strong>${escaparHtml(item.sms)}</div>
-        <div class="detail-item"><strong>Roaming UE</strong>${escaparHtml(item.dados_roaming)}</div>
+        <div class="detail-item"><strong>Roaming UE</strong>${escaparHtml(textoDadosRoaming(item.dados_roaming))}</div>
         <div class="detail-item"><strong>Fidelização</strong>${escaparHtml(fidelizacao)}</div>
         <div class="detail-item"><strong>Mensalidade atual</strong>${escaparHtml(euros(item.mensalidade_base))}</div>
         <div class="detail-item"><strong>Mensalidade promocional</strong>${escaparHtml(euros(item.mensalidade_promo))}</div>
@@ -1572,7 +1595,7 @@
           <td>${Number(t.mensalidade_promo ?? t.mensalidade_base ?? 0).toFixed(2).replace(".", ",")} €/mês</td>
           <td>
             ${dadosIlimitados(t) ? "Ilimitado" : t.dados_gb > 0 ? t.dados_gb + " GB" : "—"}
-            ${!dadosIlimitados(t) && t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + t.dados_roaming + "</span>" : ""}
+            ${!dadosIlimitados(t) && t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + escaparHtml(textoDadosRoaming(t.dados_roaming)) + "</span>" : ""}
           </td>
           <td>${escaparHtml(textoComunicacao(t.minutos, "min"))}</td>
           <td>${escaparHtml(textoComunicacao(t.sms, "SMS"))}</td>
