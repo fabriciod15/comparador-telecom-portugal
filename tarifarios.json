@@ -474,7 +474,7 @@
     "sms": "Ilimitado",
     "fidelizacao_meses": 0,
     "mensalidade_base": 9,
-    "mensalidade_promo": 0,
+    "mensalidade_promo": 9,
     "meses_promo": 0,
     "custo_instalacao": 0,
     "oferta_voucher": 0
@@ -503,7 +503,7 @@
     "sms": "—",
     "fidelizacao_meses": 24,
     "mensalidade_base": 7,
-    "mensalidade_promo": 0,
+    "mensalidade_promo": 7,
     "meses_promo": 0,
     "custo_instalacao": 0,
     "oferta_voucher": 0
