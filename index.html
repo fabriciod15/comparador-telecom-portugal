@@ -756,6 +756,23 @@
       text-align: right;
     }
 
+    .tariff-table-mobile th:nth-child(2),
+    .tariff-table-mobile td:nth-child(2),
+    .tariff-table-mobile th:nth-child(3),
+    .tariff-table-mobile td:nth-child(3),
+    .tariff-table-mobile th:nth-child(4),
+    .tariff-table-mobile td:nth-child(4) {
+      text-align: center;
+    }
+
+    .tariff-table-mobile th:nth-child(2) .table-sort,
+    .tariff-table-mobile th:nth-child(3) .table-sort,
+    .tariff-table-mobile th:nth-child(4) .table-sort {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+    }
+
     .table-sort {
       display: inline-flex;
       align-items: center;
@@ -1268,7 +1285,7 @@
 
       container.innerHTML = `
         <div class="tariff-table-wrap">
-          <table class="tariff-table">
+          <table class="tariff-table${tabAtiva === "MOVEL" ? " tariff-table-mobile" : ""}">
             <thead>
               <tr>
                 <th>Tarifário</th>
