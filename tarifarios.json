@@ -214,128 +214,8 @@
     "servicos": [
       "MOVEL"
     ],
-    "operadora": "NOS",
-    "tipo": "Tarifário móvel pós-pago",
-    "nome": "NOS Gigas 100 GB",
-    "fibra_mbps": 0,
-    "tv_canais": 0,
-    "cartoes_moveis": 1,
-    "dados_gb": 100,
-    "dados_roaming": "",
-    "minutos": "3500 min/SMS",
-    "sms": "3500 min/SMS",
-    "fidelizacao_meses": 24,
-    "mensalidade_base": 14.99,
-    "mensalidade_promo": 9.99,
-    "meses_promo": 0,
-    "custo_instalacao": 0,
-    "oferta_voucher": 0,
-    "fonte": "https://www.nos.pt/movel/tarifarios-movel/tarifarios-movel-pos-pagos",
-    "clientes": [
-      "NOVOS",
-      "ATUAIS"
-    ],
-    "abas": [
-      "MOVEL"
-    ]
-  },
-  {
-    "categoria": "MOVEL",
-    "servicos": [
-      "MOVEL"
-    ],
-    "operadora": "NOS",
-    "tipo": "Tarifário móvel pós-pago",
-    "nome": "NOS Gigas ILIMITADO",
-    "fibra_mbps": 0,
-    "tv_canais": 0,
-    "cartoes_moveis": 1,
-    "dados_gb": null,
-    "dados_roaming": "",
-    "minutos": "3500 min/SMS",
-    "sms": "3500 min/SMS",
-    "fidelizacao_meses": 24,
-    "mensalidade_base": 19.99,
-    "mensalidade_promo": 19.99,
-    "meses_promo": 0,
-    "custo_instalacao": 0,
-    "oferta_voucher": 0,
-    "fonte": "https://www.nos.pt/movel/tarifarios-movel/tarifarios-movel-pos-pagos",
-    "clientes": [
-      "NOVOS",
-      "ATUAIS"
-    ],
-    "abas": [
-      "MOVEL"
-    ]
-  },
-  {
-    "categoria": "MOVEL",
-    "servicos": [
-      "MOVEL"
-    ],
-    "operadora": "NOS",
-    "tipo": "Tarifário móvel pós-pago",
-    "nome": "NOS Gigas 200 GB",
-    "fibra_mbps": 0,
-    "tv_canais": 0,
-    "cartoes_moveis": 1,
-    "dados_gb": 200,
-    "dados_roaming": "",
-    "minutos": "3500 min/SMS",
-    "sms": "3500 min/SMS",
-    "fidelizacao_meses": 24,
-    "mensalidade_base": 0,
-    "mensalidade_promo": 16.99,
-    "meses_promo": 0,
-    "custo_instalacao": 0,
-    "oferta_voucher": 0,
-    "fonte": "https://www.nos.pt/movel/tarifarios-movel/tarifarios-movel-pos-pagos",
-    "clientes": [
-      "NOVOS",
-      "ATUAIS"
-    ],
-    "abas": [
-      "MOVEL"
-    ]
-  },
-  {
-    "categoria": "MOVEL",
-    "servicos": [
-      "MOVEL"
-    ],
-    "operadora": "NOS",
-    "tipo": "Tarifário móvel pós-pago",
-    "nome": "NOS Gigas 500 GB",
-    "fibra_mbps": 0,
-    "tv_canais": 0,
-    "cartoes_moveis": 1,
-    "dados_gb": 500,
-    "dados_roaming": "",
-    "minutos": "3500 min/SMS",
-    "sms": "3500 min/SMS",
-    "fidelizacao_meses": 24,
-    "mensalidade_base": 0,
-    "mensalidade_promo": 19.99,
-    "meses_promo": 0,
-    "custo_instalacao": 0,
-    "oferta_voucher": 0,
-    "fonte": "https://www.nos.pt/movel/tarifarios-movel/tarifarios-movel-pos-pagos",
-    "clientes": [
-      "NOVOS",
-      "ATUAIS"
-    ],
-    "abas": [
-      "MOVEL"
-    ]
-  },
-  {
-    "categoria": "MOVEL",
-    "servicos": [
-      "MOVEL"
-    ],
     "operadora": "WTF",
-    "tipo": "Tarifário móvel pós-pago",
+    "tipo": "Tarifário móvel pré-pago",
     "nome": "WTF Móvel ILIMITADO",
     "fibra_mbps": 0,
     "tv_canais": 0,
@@ -352,8 +232,7 @@
     "oferta_voucher": 0,
     "fonte": "https://www.wtf.pt/tarifarios",
     "clientes": [
-      "NOVOS",
-      "ATUAIS"
+      "NOVOS"
     ],
     "abas": [
       "MOVEL"
