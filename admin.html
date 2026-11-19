@@ -42,6 +42,13 @@
     .communication-mode label { flex-direction:row; align-items:center; }
     .communication-mode input { width:16px; height:16px; }
     .communication-quantity.oculto { display:none; }
+    .active-toggle { position:relative; grid-column:1/-1; display:flex; flex-direction:row; align-items:center; gap:9px; cursor:pointer; }
+    .active-toggle input { position:absolute; width:1px; height:1px; padding:0; opacity:0; }
+    .toggle-track { position:relative; width:40px; height:22px; flex:none; border-radius:999px; background:#c5cfdd; transition:background 150ms; }
+    .toggle-track::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:transform 150ms; }
+    .active-toggle input:checked + .toggle-track { background:var(--blue); }
+    .active-toggle input:checked + .toggle-track::after { transform:translateX(18px); }
+    .active-toggle input:focus-visible + .toggle-track { outline:2px solid var(--ink); outline-offset:2px; }
     .card-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
     .status { min-height:20px; margin-top:10px; color:var(--muted); font-size:13px; }
     .status.error { color:var(--danger); }
@@ -115,6 +122,10 @@
       return `<label>${label}<input type="text" data-key="${key}" value="${String(value ?? "").replace(/"/g,"&quot;")}"></label>`;
     }
 
+    function dateField(label, key, value) {
+      return `<label>${label}<input type="date" data-key="${key}" value="${String(value ?? "").replace(/"/g,"&quot;")}"></label>`;
+    }
+
     function communicationValue(value) {
       const text = String(value ?? "").trim();
       const quantity = text.match(/[0-9]+/);
@@ -186,6 +197,11 @@
         <article class="card" data-index="${index}">
           <h3>${index + 1}. ${item.nome || "Novo tarifário"}</h3>
           <div class="grid">
+            <label class="active-toggle">
+              <input type="checkbox" data-active ${item.ativo !== false ? "checked" : ""}>
+              <span class="toggle-track" aria-hidden="true"></span>
+              <span data-active-label>${item.ativo !== false ? "Ativo no website público" : "Inativo no website público"}</span>
+            </label>
             ${textField("Nome do tarifário","nome",item.nome)}
             ${textField("Tipo","tipo",item.tipo)}
             ${textField("Link do tarifário","fonte",item.fonte)}
@@ -202,6 +218,7 @@
             ${numberField("Mensalidade base","mensalidade_base",item.mensalidade_base)}
             ${numberField("Mensalidade promo","mensalidade_promo",item.mensalidade_promo)}
             ${numberField("Meses promo","meses_promo",item.meses_promo)}
+            ${dateField("Data limite de adesão","data_limite_adesao",item.data_limite_adesao)}
             ${numberField("Instalação","custo_instalacao",item.custo_instalacao)}
             ${numberField("Oferta/voucher","oferta_voucher",item.oferta_voucher)}
             <div class="services"><strong>Serviços</strong>${["NET","TV","VOZ","MOVEL"].map(service => `<label><input type="checkbox" data-service="${service}" ${item.servicos?.includes(service)?"checked":""}> ${service}</label>`).join("")}</div>
@@ -244,6 +261,7 @@
         const dadosUnlimited = card.querySelector("[data-dados-mode]:checked")?.dataset.dadosMode === "ILIMITADO";
         const dadosGbField = card.querySelector('[data-key="dados_gb"]');
         tariffs[index].dados_gb = dadosUnlimited ? null : Number(dadosGbField?.value ?? 0);
+        tariffs[index].ativo = card.querySelector("[data-active]").checked;
         card.querySelectorAll("[data-communication-field]").forEach(field => {
           const key = field.dataset.communicationField;
           const mode = field.querySelector("[data-communication-mode]:checked")?.dataset.communicationMode || "NAO_CONFIRMADO";
@@ -308,7 +326,7 @@
     });
     document.getElementById("add").addEventListener("click", () => {
       collect();
-      tariffs.push({ categoria:"CASA",servicos:["NET"],abas:["NET"],clientes:["NOVOS","ATUAIS"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fonte:"",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:null,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
+      tariffs.push({ categoria:"CASA",servicos:["NET"],abas:["NET"],clientes:["NOVOS","ATUAIS"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fonte:"",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:null,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,data_limite_adesao:"",ativo:true,custo_instalacao:0,oferta_voucher:0 });
       render();
     });
     document.getElementById("cards").addEventListener("click", event => {
@@ -326,6 +344,10 @@
       if (event.target.matches("[data-communication-mode]")) {
         const field = event.target.closest("[data-communication-field]");
         field.querySelector(".communication-quantity").classList.toggle("oculto", event.target.dataset.communicationMode !== "LIMITADO");
+      }
+      if (event.target.matches("[data-active]")) {
+        event.target.closest(".active-toggle").querySelector("[data-active-label]").textContent =
+          event.target.checked ? "Ativo no website público" : "Inativo no website público";
       }
     });
     document.getElementById("save-local").addEventListener("click", () => {

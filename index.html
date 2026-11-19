@@ -890,6 +890,13 @@
       font-size: 12px;
     }
 
+    .promo-details {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
     .tariff-monthly {
       color: var(--green);
       font-size: 20px;
@@ -1211,6 +1218,30 @@
       return quantidade ? `${quantidade[0]} ${unidade}` : "Não confirmado";
     }
 
+    function precoPromocional(item) {
+      const base = Number(item.mensalidade_base ?? item.mensalidade_promo ?? 0);
+      const promocional = Number(item.mensalidade_promo ?? base);
+      return promocional < base;
+    }
+
+    function formatarDataLimiteAdesao(valor) {
+      const match = String(valor ?? "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      return match ? `${match[3]}/${match[2]}/${match[1]}` : "Não indicada";
+    }
+
+    function formatarEuros(valor) {
+      return Number(valor || 0).toFixed(2).replace(".", ",") + " €";
+    }
+
+    function detalhesPromocao(item) {
+      if (!precoPromocional(item)) return "";
+      const base = Number(item.mensalidade_base ?? item.mensalidade_promo ?? 0);
+      const dataLimite = item.data_limite_adesao
+        ? `Adesão até ${escaparHtml(formatarDataLimiteAdesao(item.data_limite_adesao))}`
+        : "Data limite de adesão não indicada";
+      return `<span class="promo-details">${dataLimite}<br>Preço sem promoção: ${formatarEuros(base)}/mês</span>`;
+    }
+
     function atualizarVista() {
       const operadorasSelecionadas = [...document.querySelectorAll("#operator-menu input:checked")]
         .map(input => input.value);
@@ -1223,6 +1254,7 @@
       const tvFiltro = document.getElementById("filtro-tv").value;
 
       const resultados = todosTarifarios
+        .filter(t => t.ativo !== false)
         .filter(t => {
           if (Array.isArray(t.abas) && t.abas.length > 0) {
             return t.abas.includes(tabAtiva);
@@ -1346,7 +1378,7 @@
         const precoBase = Number(item.mensalidade_base ?? item.mensalidade_promo ?? 0);
         const precoPromo = Number(item.mensalidade_promo ?? item.mensalidade_base ?? 0);
         const textoPromo = item.meses_promo > 0
-          ? `${precoPromo.toFixed(2).replace(".", ",")} € nos primeiros ${item.meses_promo} meses, depois ${precoBase.toFixed(2).replace(".", ",")} €`
+          ? `${precoPromo.toFixed(2).replace(".", ",")} € nos primeiros ${item.meses_promo} meses`
           : "";
         const textoVoucher = item.oferta_voucher > 0
           ? `<br>Oferta/voucher: −${item.oferta_voucher.toFixed(2).replace(".", ",")} €`
@@ -1385,6 +1417,7 @@
            <td>
              <div class="tariff-monthly">${precoPromo.toFixed(2).replace(".", ",")} € <small>/mês</small></div>
              <div class="tariff-feature-muted">${textoPromo}${textoVoucher}</div>
+             ${detalhesPromocao(item)}
            </td>
            <td>
              <div class="tariff-actions">
@@ -1595,6 +1628,7 @@
         <div class="detail-item"><strong>Fidelização</strong>${escaparHtml(fidelizacao)}</div>
         <div class="detail-item"><strong>Mensalidade atual</strong>${escaparHtml(euros(item.mensalidade_base))}</div>
         <div class="detail-item"><strong>Mensalidade promocional</strong>${escaparHtml(euros(item.mensalidade_promo))}</div>
+        ${precoPromocional(item) ? `<div class="detail-item"><strong>Data limite de adesão</strong>${escaparHtml(formatarDataLimiteAdesao(item.data_limite_adesao))}</div>` : ""}
         <div class="detail-item"><strong>Meses promocionais</strong>${escaparHtml(item.meses_promo || 0)}</div>
         <div class="detail-item"><strong>Custo de instalação</strong>${escaparHtml(euros(item.custo_instalacao))}</div>
         <div class="detail-item"><strong>Oferta/voucher</strong>${escaparHtml(euros(item.oferta_voucher))}</div>
@@ -1605,7 +1639,7 @@
     function abrirComparacao() {
       if (tarifariosSelecionados.size < 2) return;
       const selecionados = todosTarifarios
-        .filter(t => tarifariosSelecionados.has(t.nome));
+        .filter(t => t.ativo !== false && tarifariosSelecionados.has(t.nome));
 
       const linhas = selecionados.map(t => `
         <tr>
@@ -1613,7 +1647,10 @@
             <span class="compare-name">${t.nome}</span>
             <span class="op-badge op-${t.operadora}">${t.operadora}</span>
           </th>
-          <td>${Number(t.mensalidade_promo ?? t.mensalidade_base ?? 0).toFixed(2).replace(".", ",")} €/mês</td>
+          <td>
+            ${Number(t.mensalidade_promo ?? t.mensalidade_base ?? 0).toFixed(2).replace(".", ",")} €/mês
+            ${detalhesPromocao(t)}
+          </td>
           <td>
             ${dadosIlimitados(t) ? "Ilimitado" : t.dados_gb > 0 ? t.dados_gb + " GB" : "—"}
             ${!dadosIlimitados(t) && t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + escaparHtml(textoDadosRoaming(t.dados_roaming)) + "</span>" : ""}
