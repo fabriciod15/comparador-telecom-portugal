@@ -1010,7 +1010,7 @@
         const response = await fetch("tarifarios.json?v=" + Date.now());
         if (!response.ok) throw new Error("Não foi possível carregar tarifarios.json");
         todosTarifarios = await response.json();
-        carregarTarifarios();
+        atualizarVista();
       } catch (error) {
         console.error(error);
         document.getElementById("lista-resultados").innerHTML =
@@ -1052,7 +1052,7 @@
           })
           .then(tarifarios => {
             todosTarifarios = tarifarios;
-            atualizarVista();
+            carregarTarifarios();
           })
           .catch(error => {
             console.error(error);
