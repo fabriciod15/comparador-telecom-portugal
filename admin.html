@@ -37,6 +37,11 @@
     .data-mode label { flex-direction:row; align-items:center; }
     .data-mode input { width:16px; height:16px; }
     .data-gb.oculto { display:none; }
+    .communication-options { grid-column:1/-1; display:flex; flex-direction:column; gap:8px; }
+    .communication-mode { display:flex; flex-wrap:wrap; gap:12px; }
+    .communication-mode label { flex-direction:row; align-items:center; }
+    .communication-mode input { width:16px; height:16px; }
+    .communication-quantity.oculto { display:none; }
     .card-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
     .status { min-height:20px; margin-top:10px; color:var(--muted); font-size:13px; }
     .status.error { color:var(--danger); }
@@ -110,6 +115,43 @@
       return `<label>${label}<input type="text" data-key="${key}" value="${String(value ?? "").replace(/"/g,"&quot;")}"></label>`;
     }
 
+    function communicationValue(value) {
+      const text = String(value ?? "").trim();
+      const quantity = text.match(/[0-9]+/);
+      return {
+        mode: /ilimitad/i.test(text) ? "ILIMITADO" : quantity ? "LIMITADO" : "NAO_CONFIRMADO",
+        quantity: quantity ? Number(quantity[0]) : 0,
+      };
+    }
+
+    function communicationField(item, index, key, label) {
+      const value = communicationValue(item[key]);
+      return `
+        <div class="communication-options" data-communication-field="${key}">
+          <strong>${label}</strong>
+          <div class="communication-mode">
+            <label><input type="radio" name="${key}-mode-${index}" data-communication-mode="LIMITADO" ${value.mode === "LIMITADO" ? "checked" : ""}> Limitado</label>
+            <label><input type="radio" name="${key}-mode-${index}" data-communication-mode="ILIMITADO" ${value.mode === "ILIMITADO" ? "checked" : ""}> Ilimitado</label>
+            <label><input type="radio" name="${key}-mode-${index}" data-communication-mode="NAO_CONFIRMADO" ${value.mode === "NAO_CONFIRMADO" ? "checked" : ""}> Não confirmado</label>
+          </div>
+          <label class="communication-quantity ${value.mode === "LIMITADO" ? "" : "oculto"}">Quantidade
+            <input type="number" min="0" step="1" data-communication-quantity value="${value.quantity}">
+          </label>
+        </div>
+      `;
+    }
+
+    function updatedCommunicationValue(original, mode, quantity) {
+      const current = communicationValue(original);
+      if (mode === current.mode) {
+        if (mode !== "LIMITADO" || current.quantity === quantity) return original;
+        return String(original).replace(/[0-9]+/, String(quantity));
+      }
+      if (mode === "ILIMITADO") return "Ilimitado";
+      if (mode === "LIMITADO") return String(quantity);
+      return "";
+    }
+
     function dataField(item, index) {
       const ilimitado = item.dados_gb == null ||
         (Number(item.dados_gb) === 0 && /ilimitad/i.test(item.nome || ""));
@@ -154,8 +196,8 @@
             ${numberField("Cartões móveis","cartoes_moveis",item.cartoes_moveis)}
             ${dataField(item,index)}
             ${textField("Dados roaming UE","dados_roaming",item.dados_roaming)}
-            ${textField("Minutos","minutos",item.minutos)}
-            ${textField("SMS","sms",item.sms)}
+            ${communicationField(item,index,"minutos","Minutos")}
+            ${communicationField(item,index,"sms","SMS")}
             ${numberField("Fidelização meses","fidelizacao_meses",item.fidelizacao_meses)}
             ${numberField("Mensalidade base","mensalidade_base",item.mensalidade_base)}
             ${numberField("Mensalidade promo","mensalidade_promo",item.mensalidade_promo)}
@@ -202,6 +244,12 @@
         const dadosUnlimited = card.querySelector("[data-dados-mode]:checked")?.dataset.dadosMode === "ILIMITADO";
         const dadosGbField = card.querySelector('[data-key="dados_gb"]');
         tariffs[index].dados_gb = dadosUnlimited ? null : Number(dadosGbField?.value ?? 0);
+        card.querySelectorAll("[data-communication-field]").forEach(field => {
+          const key = field.dataset.communicationField;
+          const mode = field.querySelector("[data-communication-mode]:checked")?.dataset.communicationMode || "NAO_CONFIRMADO";
+          const quantity = Number(field.querySelector("[data-communication-quantity]")?.value ?? 0);
+          tariffs[index][key] = updatedCommunicationValue(tariffs[index][key], mode, quantity);
+        });
         tariffs[index].servicos = [...card.querySelectorAll("[data-service]:checked")].map(field => field.dataset.service);
         tariffs[index].abas = [...card.querySelectorAll("[data-aba]:checked")].map(field => field.dataset.aba);
         const selected = card.querySelector("[data-cliente]:checked")?.dataset.cliente || "TODOS";
@@ -270,10 +318,15 @@
       render();
     });
     document.getElementById("cards").addEventListener("change", event => {
-      if (!event.target.matches("[data-dados-mode]")) return;
-      const card = event.target.closest(".card");
-      const gbField = card.querySelector(".data-gb");
-      gbField.classList.toggle("oculto", event.target.dataset.dadosMode === "ILIMITADO");
+      if (event.target.matches("[data-dados-mode]")) {
+        const card = event.target.closest(".card");
+        const gbField = card.querySelector(".data-gb");
+        gbField.classList.toggle("oculto", event.target.dataset.dadosMode === "ILIMITADO");
+      }
+      if (event.target.matches("[data-communication-mode]")) {
+        const field = event.target.closest("[data-communication-field]");
+        field.querySelector(".communication-quantity").classList.toggle("oculto", event.target.dataset.communicationMode !== "LIMITADO");
+      }
     });
     document.getElementById("save-local").addEventListener("click", () => {
       collect();

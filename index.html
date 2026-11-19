@@ -1158,6 +1158,13 @@
       return numeros.length ? Math.max(...numeros) : 0;
     }
 
+    function textoComunicacao(valor, unidade) {
+      const texto = String(valor ?? "").trim();
+      if (/ilimitad/i.test(texto)) return "Ilimitado";
+      const quantidade = texto.match(/[0-9]+/);
+      return quantidade ? `${quantidade[0]} ${unidade}` : "Não confirmado";
+    }
+
     function atualizarVista() {
       const operadorasSelecionadas = [...document.querySelectorAll("#operator-menu input:checked")]
         .map(input => input.value);
@@ -1312,10 +1319,9 @@
         const dadosRoaming = item.dados_roaming && String(item.dados_roaming).trim()
           ? escaparHtml(item.dados_roaming)
           : "Não confirmado";
-        const chamadasSms = [
-          item.minutos ? escaparHtml(item.minutos) : "",
-          item.sms ? escaparHtml(item.sms) : "",
-        ].filter(Boolean).join("<br>");
+        const chamadasSms = `
+          <span class="tariff-feature">${escaparHtml(textoComunicacao(item.minutos, "min"))}</span>
+          <span class="tariff-feature">${escaparHtml(textoComunicacao(item.sms, "SMS"))}</span>`;
 
         row.innerHTML =
           `<td class="tariff-name">
@@ -1327,7 +1333,7 @@
            ${tabAtiva === "MOVEL"
              ? `<td><span class="tariff-feature">${escaparHtml(dadosTexto)}</span></td>
                 <td><span class="tariff-feature">${dadosRoaming}</span></td>
-                <td><span class="tariff-feature">${chamadasSms || "Não confirmado"}</span></td>`
+                <td>${chamadasSms}</td>`
              : `<td>${caracteristicas}</td>`}
            <td>${escaparHtml(fidelizacao)}</td>
            <td>
@@ -1566,8 +1572,8 @@
             ${dadosIlimitados(t) ? "Ilimitado" : t.dados_gb > 0 ? t.dados_gb + " GB" : "—"}
             ${!dadosIlimitados(t) && t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + t.dados_roaming + "</span>" : ""}
           </td>
-          <td>${t.minutos || "—"}</td>
-          <td>${t.sms || "—"}</td>
+          <td>${escaparHtml(textoComunicacao(t.minutos, "min"))}</td>
+          <td>${escaparHtml(textoComunicacao(t.sms, "SMS"))}</td>
           <td>${t.fidelizacao_meses == null ? "Não confirmada" : t.fidelizacao_meses === 0 ? "Sem fidelização" : t.fidelizacao_meses + " meses"}</td>
         </tr>
       `).join("");
