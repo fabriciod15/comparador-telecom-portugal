@@ -654,6 +654,7 @@
         <button class="tab-btn active" data-tab="TODOS">Ver todos</button>
         <button class="tab-btn" data-tab="MOVEL">Móvel</button>
         <button class="tab-btn" data-tab="NET">Net</button>
+        <button class="tab-btn" data-tab="NET_MOVEL">Net + Móvel</button>
         <button class="tab-btn" data-tab="TV_NET_VOZ">TV + Net + Voz</button>
         <button class="tab-btn" data-tab="TV_NET_VOZ_MOVEL">TV + Net + Voz + Móvel</button>
         <button class="tab-btn" data-tab="PERSONALIZADO">Personalizado</button>
@@ -795,6 +796,7 @@
           if (tabAtiva === "TODOS") return true;
           if (tabAtiva === "MOVEL") return t.categoria === "MOVEL";
           if (tabAtiva === "NET") return t.servicos.includes("NET") && t.servicos.length === 1;
+          if (tabAtiva === "NET_MOVEL") return t.servicos.includes("NET") && t.servicos.includes("MOVEL") && t.servicos.length === 2;
           if (tabAtiva === "TV_NET_VOZ") return t.servicos.includes("TV") && t.servicos.includes("NET") && t.servicos.includes("VOZ") && !t.servicos.includes("MOVEL");
           if (tabAtiva === "TV_NET_VOZ_MOVEL") return t.servicos.includes("TV") && t.servicos.includes("NET") && t.servicos.includes("VOZ") && t.servicos.includes("MOVEL");
           if (tabAtiva === "PERSONALIZADO") {
@@ -889,11 +891,13 @@
         } else {
           titulo.textContent = tabAtiva === "NET"
             ? "Encontra o melhor serviço de fibra"
-            : tabAtiva === "TV_NET_VOZ"
-              ? "Compara pacotes TV, net e voz"
-              : tabAtiva === "TV_NET_VOZ_MOVEL"
-                ? "Compara pacotes completos"
-                : "Compara todas as telecomunicações";
+            : tabAtiva === "NET_MOVEL"
+              ? "Compara pacotes net e móvel"
+              : tabAtiva === "TV_NET_VOZ"
+                ? "Compara pacotes TV, net e voz"
+                : tabAtiva === "TV_NET_VOZ_MOVEL"
+                  ? "Compara pacotes completos"
+                  : "Compara todas as telecomunicações";
           descricao.textContent = "Compara o custo real e escolhe a opção mais adequada.";
           campoFibra.classList.remove("oculto");
           campoTv.classList.remove("oculto");
