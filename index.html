@@ -725,6 +725,123 @@
       text-align: center;
     }
 
+    .tariff-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(20, 33, 61, 0.04);
+    }
+
+    .tariff-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+
+    .tariff-table th {
+      border-bottom: 1px solid var(--line);
+      background: #f7f9fc;
+      color: var(--muted);
+      padding: 12px 14px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .tariff-table th:nth-child(n+4),
+    .tariff-table td:nth-child(n+4) {
+      text-align: right;
+    }
+
+    .tariff-row {
+      border-bottom: 1px solid var(--line);
+      transition: background 140ms, box-shadow 140ms;
+    }
+
+    .tariff-row:last-child { border-bottom: 0; }
+
+    .tariff-row:hover {
+      background: #fbfdff;
+      box-shadow: inset 3px 0 0 #dbe4f1;
+    }
+
+    .tariff-row.melhor-opcao {
+      background: linear-gradient(90deg, var(--green-soft), #fff 28%);
+      box-shadow: inset 3px 0 0 var(--green);
+    }
+
+    .tariff-row.selecionado {
+      background: #f3f7ff;
+      box-shadow: inset 3px 0 0 var(--blue);
+    }
+
+    .tariff-table td {
+      padding: 16px 14px;
+      color: var(--ink-2);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .tariff-name {
+      min-width: 210px;
+    }
+
+    .tariff-name .selo-vencedor {
+      position: static;
+      display: table;
+      margin-bottom: 6px;
+    }
+
+    .tariff-name h2 {
+      margin: 5px 0 2px;
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .tariff-type {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .tariff-feature {
+      display: block;
+      margin: 3px 0;
+      font-weight: 750;
+    }
+
+    .tariff-feature-muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tariff-monthly {
+      color: var(--green);
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.4px;
+      white-space: nowrap;
+    }
+
+    .tariff-monthly small {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tariff-actions {
+      display: flex;
+      min-width: 132px;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 7px;
+    }
+
+    .tariff-actions .details-button { height: 32px; }
+
     .methodology {
       margin-top: 24px;
       border: 1px solid var(--line);
@@ -757,6 +874,7 @@
       .trust-panel { display: none; }
       .hero-inner { min-height: 205px; }
       .cartao-pacote { grid-template-columns: 1.3fr 1.4fr 0.8fr auto; gap: 16px; }
+      .tariff-table-wrap { border-radius: 12px; }
     }
 
     @media (max-width: 700px) {
@@ -1058,9 +1176,27 @@
         return;
       }
 
+      container.innerHTML = `
+        <div class="tariff-table-wrap">
+          <table class="tariff-table">
+            <thead>
+              <tr>
+                <th>Tarifário</th>
+                <th>Características</th>
+                <th>Fidelização</th>
+                <th>Mensalidade</th>
+                <th>Custo 24 meses</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>`;
+      const tbody = container.querySelector(".tariff-table tbody");
+
       resultados.forEach((item, index) => {
-        const card = document.createElement("article");
-        card.className = "cartao-pacote" + (index === 0 ? " melhor-opcao" : "");
+        const row = document.createElement("tr");
+        row.className = "tariff-row" + (index === 0 ? " melhor-opcao" : "");
         const conhecida = ["DIGI","WOO","MEO","Vodafone","NOS","Amigo","UZO","Moche","Yorn","WTF"].includes(item.operadora);
         const classeOp = conhecida ? "op-" + item.operadora : "op-default";
 
@@ -1078,47 +1214,52 @@
         const tituloTarifario = fonteSegura
           ? `<a class="pacote-titulo-link" href="${fonteSegura}" target="_blank" rel="noopener noreferrer">${item.nome}</a>`
           : item.nome;
-        const specs = item.categoria === "MOVEL"
-          ? `<span class="spec-pill">${dadosTexto}</span>
-             <span class="spec-pill">Chamadas e SMS incluídos</span>
-             <span class="spec-pill">${item.fidelizacao_meses == null ? "Fidelização não confirmada" : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses fidelização"}</span>
-             <span class="spec-pill">Em Portugal</span>`
-          : `<span class="spec-pill">Fibra ${item.fibra_mbps >= 1000 ? "1 Gbps" : item.fibra_mbps + " Mbps"}</span>
-             <span class="spec-pill">${item.tv_canais > 0 ? item.tv_canais + " canais TV" : "Sem TV"}</span>
-             <span class="spec-pill">${item.cartoes_moveis} cartão móvel · ${item.dados_gb} GB</span>
-             <span class="spec-pill">${item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses fidelização"}</span>`;
+        const caracteristicas = item.categoria === "MOVEL"
+          ? `<span class="tariff-feature">${dadosTexto}</span>
+             <span class="tariff-feature-muted">Chamadas e SMS incluídos</span>
+             <span class="tariff-feature-muted">Em Portugal</span>`
+          : `<span class="tariff-feature">Fibra ${item.fibra_mbps >= 1000 ? (item.fibra_mbps === 10000 ? "10 Gbps" : "1 Gbps") : item.fibra_mbps + " Mbps"}</span>
+             <span class="tariff-feature-muted">${item.tv_canais > 0 ? item.tv_canais + " canais TV" : "Sem TV"}</span>
+             <span class="tariff-feature-muted">${item.cartoes_moveis || 0} cartão${Number(item.cartoes_moveis) === 1 ? "" : "s"} móvel${item.dados_gb != null && item.dados_gb > 0 ? " · " + item.dados_gb + " GB" : ""}</span>`;
+        const fidelizacao = item.fidelizacao_meses == null
+          ? "Não confirmada"
+          : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses";
 
-        card.innerHTML =
-          (index === 0 ? '<div class="selo-vencedor">Melhor preço real</div>' : "") +
-          `<div>
-             <span class="op-badge ${classeOp}">${item.operadora}</span>
-             <h2 class="pacote-titulo">${tituloTarifario}</h2>
-             <div class="pacote-tipo">${item.tipo}</div>
-           </div>
-           <div class="specs">${specs}</div>
-           <div class="preco-box">
-             <div class="preco-label">${item.categoria === "MOVEL" ? "Mensalidade real" : "Custo médio real"}</div>
-             <div class="preco-real">${item.calculo.mediaMensal.toFixed(2).replace(".", ",")} €<span>/mês</span></div>
-             <div class="preco-detalhes">${textoPromo}${textoVoucher}</div>
-             <div class="total-24m">Total a 24 meses: ${item.calculo.total24m.toFixed(2).replace(".", ",")} €</div>
-           </div>
-           <div class="card-actions">
-             <button class="details-button" type="button" data-detalhes="${item.nome}">Ver mais detalhes</button>
-             <label class="compare-check">
-               <input type="checkbox" data-comparar="${item.nome}">
-               Comparar
-             </label>
-           </div>`;
-        card.classList.toggle("selecionado", tarifariosSelecionados.has(item.nome));
-        card.querySelector("[data-comparar]").checked = tarifariosSelecionados.has(item.nome);
-        card.querySelector("[data-comparar]").addEventListener("change", evento => {
+        row.innerHTML =
+          `<td class="tariff-name">
+             ${index === 0 ? '<span class="selo-vencedor">Melhor preço real</span>' : ""}
+             <span class="op-badge ${classeOp}">${escaparHtml(item.operadora)}</span>
+             <h2>${tituloTarifario}</h2>
+             <div class="tariff-type">${escaparHtml(item.tipo)}</div>
+           </td>
+           <td>${caracteristicas}</td>
+           <td>${escaparHtml(fidelizacao)}</td>
+           <td>
+             <div class="tariff-monthly">${item.calculo.mediaMensal.toFixed(2).replace(".", ",")} € <small>/mês</small></div>
+             <div class="tariff-feature-muted">${textoPromo}${textoVoucher}</div>
+           </td>
+           <td>
+             <strong>${item.calculo.total24m.toFixed(2).replace(".", ",")} €</strong>
+           </td>
+           <td>
+             <div class="tariff-actions">
+               <button class="details-button" type="button" data-detalhes>Ver mais detalhes</button>
+               <label class="compare-check">
+                 <input type="checkbox" data-comparar>
+                 Comparar
+               </label>
+             </div>
+           </td>`;
+        row.classList.toggle("selecionado", tarifariosSelecionados.has(item.nome));
+        row.querySelector("[data-comparar]").checked = tarifariosSelecionados.has(item.nome);
+        row.querySelector("[data-comparar]").addEventListener("change", evento => {
           if (evento.target.checked) tarifariosSelecionados.add(item.nome);
           else tarifariosSelecionados.delete(item.nome);
-          card.classList.toggle("selecionado", evento.target.checked);
+          row.classList.toggle("selecionado", evento.target.checked);
           atualizarComparacao();
         });
-        card.querySelector("[data-detalhes]").addEventListener("click", () => abrirDetalhes(item));
-        container.appendChild(card);
+        row.querySelector("[data-detalhes]").addEventListener("click", () => abrirDetalhes(item));
+        tbody.appendChild(row);
       });
     }
 
