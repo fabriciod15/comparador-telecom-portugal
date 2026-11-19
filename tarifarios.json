@@ -449,5 +449,63 @@
     "abas": [
       "MOVEL"
     ]
+  },
+  {
+    "categoria": "MOVEL",
+    "servicos": [
+      "MOVEL"
+    ],
+    "abas": [
+      "MOVEL"
+    ],
+    "clientes": [
+      "ATUAIS"
+    ],
+    "operadora": "NOS",
+    "tipo": "Tarifário móvel pós-pago",
+    "nome": "NOS 5G+ Sem Limites Max",
+    "fonte": "",
+    "fibra_mbps": 0,
+    "tv_canais": 0,
+    "cartoes_moveis": 1,
+    "dados_gb": null,
+    "dados_roaming": "13,5",
+    "minutos": "Ilimitado",
+    "sms": "Ilimitado",
+    "fidelizacao_meses": 0,
+    "mensalidade_base": 9,
+    "mensalidade_promo": 0,
+    "meses_promo": 0,
+    "custo_instalacao": 0,
+    "oferta_voucher": 0
+  },
+  {
+    "categoria": "MOVEL",
+    "servicos": [
+      "MOVEL"
+    ],
+    "abas": [
+      "MOVEL"
+    ],
+    "clientes": [
+      "ATUAIS"
+    ],
+    "operadora": "NOS",
+    "tipo": "Tarifário móvel pós-pago",
+    "nome": "NOS 5G+ Sem Limites Max",
+    "fonte": "",
+    "fibra_mbps": 0,
+    "tv_canais": 0,
+    "cartoes_moveis": 1,
+    "dados_gb": null,
+    "dados_roaming": "—",
+    "minutos": "—",
+    "sms": "—",
+    "fidelizacao_meses": 24,
+    "mensalidade_base": 7,
+    "mensalidade_promo": 0,
+    "meses_promo": 0,
+    "custo_instalacao": 0,
+    "oferta_voucher": 0
   }
 ]
