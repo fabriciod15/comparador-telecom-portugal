@@ -317,6 +317,142 @@
       background: linear-gradient(100deg, var(--green-soft) 0, #fff 19%);
     }
 
+    .compare-check {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--ink-2);
+      padding: 6px 9px 6px 7px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 5px 14px rgba(20, 33, 61, 0.08);
+    }
+
+    .compare-check input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--blue);
+    }
+
+    .cartao-pacote.selecionado {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(36, 107, 254, 0.08);
+    }
+
+    .compare-fab {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 40;
+      display: none;
+      width: 68px;
+      height: 68px;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(36, 107, 254, 0.34);
+    }
+
+    .compare-fab.visible { display: flex; }
+
+    .compare-dialog {
+      width: min(1080px, calc(100% - 32px));
+      max-height: calc(100vh - 40px);
+      border: 0;
+      border-radius: 16px;
+      padding: 0;
+      color: var(--ink);
+      box-shadow: 0 24px 70px rgba(20, 33, 61, 0.24);
+    }
+
+    .compare-dialog::backdrop {
+      background: rgba(20, 33, 61, 0.48);
+      backdrop-filter: blur(3px);
+    }
+
+    .compare-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      padding: 16px 20px;
+    }
+
+    .compare-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .compare-close {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--ink);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .compare-table-wrap {
+      max-width: 100%;
+      overflow: auto;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      min-width: 170px;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .compare-table th:last-child,
+    .compare-table td:last-child { border-right: 0; }
+
+    .compare-table thead th {
+      background: #f8fafc;
+      color: var(--ink);
+    }
+
+    .compare-table tbody th {
+      min-width: 140px;
+      background: #fbfdff;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .compare-name {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
     .selo-vencedor {
       position: absolute;
       top: -10px;
@@ -615,6 +751,19 @@
 
     <section class="lista-tarifarios" id="lista-resultados" aria-live="polite"></section>
 
+    <button class="compare-fab" id="compare-fab" type="button" aria-label="Comparar tarifários selecionados">
+      Comparar
+      <span id="compare-count">0</span>
+    </button>
+
+    <dialog class="compare-dialog" id="compare-dialog">
+      <div class="compare-header">
+        <h2>Comparação de tarifários</h2>
+        <button class="compare-close" id="compare-close" type="button" aria-label="Fechar comparação">×</button>
+      </div>
+      <div class="compare-table-wrap" id="compare-table-wrap"></div>
+    </dialog>
+
     <aside class="methodology">
       <strong>Como calculamos:</strong> custo médio mensal a 24 meses = mensalidades promocionais e normais, instalação e ofertas/vouchers.
       Confirma sempre as condições finais no site da operadora.
@@ -644,6 +793,7 @@
     ];
 
     let tabAtiva = "TODOS";
+    const tarifariosSelecionados = new Set();
 
     function calcularCusto24Meses(t) {
       const periodo = 24;
@@ -726,7 +876,19 @@
              <div class="preco-real">${item.calculo.mediaMensal.toFixed(2).replace(".", ",")} €<span>/mês</span></div>
              <div class="preco-detalhes">${textoPromo}${textoVoucher}</div>
              <div class="total-24m">Total a 24 meses: ${item.calculo.total24m.toFixed(2).replace(".", ",")} €</div>
-           </div>`;
+           </div>
+           <label class="compare-check">
+             <input type="checkbox" data-comparar="${item.nome}">
+             Comparar
+           </label>`;
+        card.classList.toggle("selecionado", tarifariosSelecionados.has(item.nome));
+        card.querySelector("[data-comparar]").checked = tarifariosSelecionados.has(item.nome);
+        card.querySelector("[data-comparar]").addEventListener("change", evento => {
+          if (evento.target.checked) tarifariosSelecionados.add(item.nome);
+          else tarifariosSelecionados.delete(item.nome);
+          card.classList.toggle("selecionado", evento.target.checked);
+          atualizarComparacao();
+        });
         container.appendChild(card);
       });
     }
@@ -776,6 +938,53 @@
       document.getElementById("filtro-fidelizacao").value = "24";
       document.getElementById("filtro-tv").value = "TODOS";
       atualizarVista();
+    });
+
+    function atualizarComparacao() {
+      const fab = document.getElementById("compare-fab");
+      const count = document.getElementById("compare-count");
+      count.textContent = tarifariosSelecionados.size;
+      fab.classList.toggle("visible", tarifariosSelecionados.size >= 3);
+      if (tarifariosSelecionados.size < 3 && document.getElementById("compare-dialog").open) {
+        document.getElementById("compare-dialog").close();
+      }
+    }
+
+    function abrirComparacao() {
+      if (tarifariosSelecionados.size < 3) return;
+      const selecionados = todosTarifarios
+        .filter(t => tarifariosSelecionados.has(t.nome))
+        .map(t => ({ ...t, calculo: calcularCusto24Meses(t) }));
+
+      const linhas = [
+        ["Operadora", t => t.operadora],
+        ["Tipo", t => t.tipo],
+        ["Fibra", t => t.fibra_mbps > 0 ? (t.fibra_mbps >= 1000 ? t.fibra_mbps / 1000 + " Gbps" : t.fibra_mbps + " Mbps") : "—"],
+        ["Televisão", t => t.tv_canais > 0 ? t.tv_canais + " canais" : "Sem TV"],
+        ["Dados móveis", t => t.dados_gb > 0 ? t.dados_gb + " GB" : "—"],
+        ["Fidelização", t => t.fidelizacao_meses === 0 ? "Sem fidelização" : t.fidelizacao_meses + " meses"],
+        ["Custo médio/mês", t => t.calculo.mediaMensal.toFixed(2).replace(".", ",") + " €"],
+        ["Total a 24 meses", t => t.calculo.total24m.toFixed(2).replace(".", ",") + " €"]
+      ];
+
+      const cabecalho = selecionados.map(t =>
+        `<th scope="col"><span class="compare-name">${t.nome}</span><span class="op-badge op-${t.operadora}">${t.operadora}</span></th>`
+      ).join("");
+      const corpo = linhas.map(([rotulo, obter]) =>
+        `<tr><th scope="row">${rotulo}</th>${selecionados.map(t => `<td>${obter(t)}</td>`).join("")}</tr>`
+      ).join("");
+
+      document.getElementById("compare-table-wrap").innerHTML =
+        `<table class="compare-table"><thead><tr><th scope="col">Tarifário</th>${cabecalho}</tr></thead><tbody>${corpo}</tbody></table>`;
+      document.getElementById("compare-dialog").showModal();
+    }
+
+    document.getElementById("compare-fab").addEventListener("click", abrirComparacao);
+    document.getElementById("compare-close").addEventListener("click", () =>
+      document.getElementById("compare-dialog").close()
+    );
+    document.getElementById("compare-dialog").addEventListener("click", evento => {
+      if (evento.target === evento.currentTarget) evento.currentTarget.close();
     });
 
     atualizarVista();
