@@ -415,6 +415,65 @@
       accent-color: var(--blue);
     }
 
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      justify-self: end;
+      align-self: stretch;
+      justify-content: flex-end;
+    }
+
+    .details-button {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--blue);
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .details-dialog {
+      width: min(620px, calc(100% - 32px));
+      max-height: calc(100vh - 40px);
+      border: 0;
+      border-radius: 16px;
+      padding: 0;
+      color: var(--ink);
+      box-shadow: 0 24px 70px rgba(20, 33, 61, 0.24);
+    }
+
+    .details-dialog::backdrop {
+      background: rgba(20, 33, 61, 0.48);
+      backdrop-filter: blur(3px);
+    }
+
+    .details-content {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 18px 20px 20px;
+    }
+
+    .detail-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fbfdff;
+    }
+
+    .detail-item strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
     .cartao-pacote.selecionado {
       border-color: var(--blue);
       box-shadow: 0 0 0 2px rgba(36, 107, 254, 0.08);
@@ -726,7 +785,7 @@
         text-align: left;
       }
       .preco-detalhes { max-width: none; }
-      .compare-check { justify-self: start; align-self: start; }
+      .card-actions { justify-self: start; align-items: flex-start; }
       .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; }
     }
 
@@ -736,6 +795,7 @@
       h1 { font-size: 34px; }
       .filters { grid-template-columns: 1fr; }
       .specs { grid-template-columns: 1fr; }
+      .details-content { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -856,10 +916,10 @@
       <div class="campo" id="campo-ordenacao">
         <label for="filtro-ordenacao">Ordenar por</label>
         <select id="filtro-ordenacao">
-          <option value="PRECO_ASC" selected>Preço ascendente</option>
-          <option value="PRECO_DESC">Preço descendente</option>
-          <option value="DADOS_ASC">Dados móveis ascendentes</option>
-          <option value="DADOS_DESC">Dados móveis descendentes</option>
+          <option value="PRECO_ASC" selected>Preço ↑</option>
+          <option value="PRECO_DESC">Preço ↓</option>
+          <option value="DADOS_ASC">Dados móveis ↑</option>
+          <option value="DADOS_DESC">Dados móveis ↓</option>
         </select>
       </div>
     </section>
@@ -882,6 +942,14 @@
         <button class="compare-close" id="compare-close" type="button" aria-label="Fechar comparação">×</button>
       </div>
       <div class="compare-table-wrap" id="compare-table-wrap"></div>
+    </dialog>
+
+    <dialog class="details-dialog" id="details-dialog">
+      <div class="compare-header">
+        <h2 id="details-title">Detalhes do tarifário</h2>
+        <button class="compare-close" id="details-close" type="button" aria-label="Fechar detalhes">×</button>
+      </div>
+      <div class="details-content" id="details-content"></div>
     </dialog>
 
     <aside class="methodology">
@@ -922,6 +990,14 @@
       } catch {
         return null;
       }
+    }
+
+    function escaparHtml(valor) {
+      return String(valor ?? "—")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
     }
 
     function atualizarVista() {
@@ -1026,10 +1102,13 @@
              <div class="preco-detalhes">${textoPromo}${textoVoucher}</div>
              <div class="total-24m">Total a 24 meses: ${item.calculo.total24m.toFixed(2).replace(".", ",")} €</div>
            </div>
-           <label class="compare-check">
-             <input type="checkbox" data-comparar="${item.nome}">
-             Comparar
-           </label>`;
+           <div class="card-actions">
+             <button class="details-button" type="button" data-detalhes="${item.nome}">Ver mais detalhes</button>
+             <label class="compare-check">
+               <input type="checkbox" data-comparar="${item.nome}">
+               Comparar
+             </label>
+           </div>`;
         card.classList.toggle("selecionado", tarifariosSelecionados.has(item.nome));
         card.querySelector("[data-comparar]").checked = tarifariosSelecionados.has(item.nome);
         card.querySelector("[data-comparar]").addEventListener("change", evento => {
@@ -1038,6 +1117,7 @@
           card.classList.toggle("selecionado", evento.target.checked);
           atualizarComparacao();
         });
+        card.querySelector("[data-detalhes]").addEventListener("click", () => abrirDetalhes(item));
         container.appendChild(card);
       });
     }
@@ -1207,6 +1287,34 @@
       }
     }
 
+    function abrirDetalhes(item) {
+      const euros = valor => Number(valor || 0).toFixed(2).replace(".", ",") + " €";
+      const dados = item.dados_gb == null ? "Ilimitados" : item.dados_gb + " GB";
+      const fidelizacao = item.fidelizacao_meses == null
+        ? "Não confirmada"
+        : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses";
+      document.getElementById("details-title").textContent = item.nome;
+      document.getElementById("details-content").innerHTML = `
+        <div class="detail-item"><strong>Operadora</strong>${escaparHtml(item.operadora)}</div>
+        <div class="detail-item"><strong>Tipo</strong>${escaparHtml(item.tipo)}</div>
+        <div class="detail-item"><strong>Categoria</strong>${escaparHtml(item.categoria)}</div>
+        <div class="detail-item"><strong>Dados móveis</strong>${escaparHtml(dados)}</div>
+        <div class="detail-item"><strong>Fibra</strong>${Number(item.fibra_mbps || 0) >= 1000 ? "1 Gbps" : escaparHtml((item.fibra_mbps || 0) + " Mbps")}</div>
+        <div class="detail-item"><strong>Televisão</strong>${Number(item.tv_canais || 0) > 0 ? escaparHtml(item.tv_canais + " canais") : "Sem TV"}</div>
+        <div class="detail-item"><strong>Cartões móveis</strong>${escaparHtml(item.cartoes_moveis ?? 0)}</div>
+        <div class="detail-item"><strong>Minutos</strong>${escaparHtml(item.minutos)}</div>
+        <div class="detail-item"><strong>SMS</strong>${escaparHtml(item.sms)}</div>
+        <div class="detail-item"><strong>Roaming UE</strong>${escaparHtml(item.dados_roaming)}</div>
+        <div class="detail-item"><strong>Fidelização</strong>${escaparHtml(fidelizacao)}</div>
+        <div class="detail-item"><strong>Mensalidade atual</strong>${escaparHtml(euros(item.mensalidade_base))}</div>
+        <div class="detail-item"><strong>Mensalidade promocional</strong>${escaparHtml(euros(item.mensalidade_promo))}</div>
+        <div class="detail-item"><strong>Meses promocionais</strong>${escaparHtml(item.meses_promo || 0)}</div>
+        <div class="detail-item"><strong>Custo de instalação</strong>${escaparHtml(euros(item.custo_instalacao))}</div>
+        <div class="detail-item"><strong>Oferta/voucher</strong>${escaparHtml(euros(item.oferta_voucher))}</div>
+      `;
+      document.getElementById("details-dialog").showModal();
+    }
+
     function abrirComparacao() {
       if (tarifariosSelecionados.size < 2) return;
       const selecionados = todosTarifarios
@@ -1251,7 +1359,13 @@
     document.getElementById("compare-close").addEventListener("click", () =>
       document.getElementById("compare-dialog").close()
     );
+    document.getElementById("details-close").addEventListener("click", () =>
+      document.getElementById("details-dialog").close()
+    );
     document.getElementById("compare-dialog").addEventListener("click", evento => {
+      if (evento.target === evento.currentTarget) evento.currentTarget.close();
+    });
+    document.getElementById("details-dialog").addEventListener("click", evento => {
       if (evento.target === evento.currentTarget) evento.currentTarget.close();
     });
 
