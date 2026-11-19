@@ -791,12 +791,12 @@
         <label>Tipo de cliente</label>
         <div class="operator-picker" id="customer-picker">
           <button class="operator-trigger" id="customer-trigger" type="button" aria-haspopup="true" aria-expanded="false">
-            Todos
+            Novos e atuais clientes
           </button>
           <div class="operator-menu" id="customer-menu">
-            <label class="operator-option"><input type="checkbox" value="TODOS" checked> Todos os clientes</label>
-            <label class="operator-option"><input type="checkbox" value="NOVOS"> Novos clientes</label>
-            <label class="operator-option"><input type="checkbox" value="ATUAIS"> Clientes atuais</label>
+            <label class="operator-option"><input type="radio" name="tipo-cliente" value="TODOS" checked> Novos e atuais clientes</label>
+            <label class="operator-option"><input type="radio" name="tipo-cliente" value="NOVOS"> Novos clientes</label>
+            <label class="operator-option"><input type="radio" name="tipo-cliente" value="ATUAIS"> Clientes atuais</label>
           </div>
         </div>
       </div>
@@ -895,9 +895,7 @@
       const operadorasSelecionadas = [...document.querySelectorAll("#operator-menu input:checked")]
         .map(input => input.value);
       const todasSelecionadas = operadorasSelecionadas.includes("TODAS") || operadorasSelecionadas.length === 0;
-      const tiposClienteSelecionados = [...document.querySelectorAll("#customer-menu input:checked")]
-        .map(input => input.value);
-      const todosOsClientes = tiposClienteSelecionados.includes("TODOS") || tiposClienteSelecionados.length === 0;
+      const tipoClienteSelecionado = document.querySelector("#customer-menu input:checked")?.value || "TODOS";
       const fibraMin = Number(document.getElementById("filtro-fibra").value);
       const dadosMin = Number(document.getElementById("filtro-dados").value);
       const fidMax = Number(document.getElementById("filtro-fidelizacao").value);
@@ -915,9 +913,9 @@
         })
         .filter(t => todasSelecionadas || operadorasSelecionadas.includes(t.operadora))
         .filter(t => {
-          if (todosOsClientes) return true;
+          if (tipoClienteSelecionado === "TODOS") return true;
           if (!Array.isArray(t.clientes) || t.clientes.length === 0) return true;
-          return tiposClienteSelecionados.some(tipo => t.clientes.includes(tipo));
+          return t.clientes.includes(tipoClienteSelecionado);
         })
         .filter(t => t.fibra_mbps >= fibraMin)
         .filter(t => t.dados_gb == null ? dadosMin === 0 : t.dados_gb >= dadosMin)
@@ -1110,23 +1108,11 @@
 
     document.querySelectorAll("#customer-menu input").forEach(input => {
       input.addEventListener("change", () => {
-        const allInput = document.querySelector('#customer-menu input[value="TODOS"]');
-        const customerInputs = [...document.querySelectorAll('#customer-menu input:not([value="TODOS"])')];
-
-        if (input.value === "TODOS" && input.checked) {
-          customerInputs.forEach(option => { option.checked = false; });
-        } else if (input.checked) {
-          allInput.checked = false;
-        } else if (!customerInputs.some(option => option.checked)) {
-          allInput.checked = true;
-        }
-
-        const selecionados = customerInputs.filter(option => option.checked).map(option => option.value);
-        customerTrigger.textContent = allInput.checked || selecionados.length === 0
-          ? "Todos"
-          : selecionados.length === 1
-            ? (selecionados[0] === "NOVOS" ? "Novos clientes" : "Clientes atuais")
-            : "Novos + atuais";
+        customerTrigger.textContent = input.value === "TODOS"
+          ? "Novos e atuais clientes"
+          : input.value === "NOVOS"
+            ? "Novos clientes"
+            : "Clientes atuais";
         atualizarVista();
       });
     });
@@ -1150,7 +1136,7 @@
         input.checked = input.value === "TODOS";
       });
       document.getElementById("operator-trigger").textContent = "Todas";
-      document.getElementById("customer-trigger").textContent = "Todos";
+      document.getElementById("customer-trigger").textContent = "Novos e atuais clientes";
       document.getElementById("filtro-fibra").value = "0";
       document.getElementById("filtro-dados").value = "0";
       document.getElementById("filtro-fidelizacao").value = "24";
