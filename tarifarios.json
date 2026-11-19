@@ -24,6 +24,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "NET"
     ]
   },
   {
@@ -51,6 +54,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "NET"
     ]
   },
   {
@@ -78,6 +84,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "NET"
     ]
   },
   {
@@ -105,6 +114,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -132,6 +144,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -159,6 +174,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -186,6 +204,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -213,6 +234,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -240,6 +264,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -267,6 +294,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -294,6 +324,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -308,7 +341,7 @@
     "tv_canais": 0,
     "cartoes_moveis": 1,
     "dados_gb": null,
-    "dados_roaming": "",
+    "dados_roaming": "12",
     "minutos": "Ilimitados",
     "sms": "Ilimitados",
     "fidelizacao_meses": 0,
@@ -321,6 +354,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -349,6 +385,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "NET_MOVEL"
     ]
   },
   {
@@ -376,6 +415,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   },
   {
@@ -403,6 +445,9 @@
     "clientes": [
       "NOVOS",
       "ATUAIS"
+    ],
+    "abas": [
+      "MOVEL"
     ]
   }
 ]
