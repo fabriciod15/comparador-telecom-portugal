@@ -8,7 +8,7 @@ export default function handler(req, res) {
   const url = new URL("https://github.com/login/oauth/authorize");
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", `${req.headers["x-forwarded-proto"] || "https"}://${req.headers.host}/api/auth/callback/github`);
-  url.searchParams.set("scope", "read:user");
+  url.searchParams.set("scope", "repo");
   url.searchParams.set("state", state);
   res.redirect(url.toString());
 }

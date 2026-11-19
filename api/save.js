@@ -13,6 +13,9 @@ export default async function handler(req, res) {
   const [payload, signature] = decodeURIComponent(match[1]).split(".");
   if (!payload || !signature) return res.status(401).json({ error: "Sessão inválida" });
   const expected = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
+  if (Buffer.from(signature).length !== Buffer.from(expected).length) {
+    return res.status(401).json({ error: "Sessão inválida" });
+  }
   if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
     return res.status(401).json({ error: "Sessão inválida" });
   }
@@ -29,8 +32,8 @@ export default async function handler(req, res) {
   if (!Array.isArray(req.body)) return res.status(400).json({ error: "Formato inválido" });
   const owner = process.env.GITHUB_OWNER || "fabriciod15";
   const repo = process.env.GITHUB_REPO || "comparador-telecomunicacoes-portugal";
-  const token = process.env.GITHUB_TOKEN;
-  if (!owner || !repo || !token) return res.status(500).json({ error: "GitHub não configurado" });
+  const token = session.accessToken || process.env.GITHUB_TOKEN;
+  if (!owner || !repo || !token) return res.status(500).json({ error: "GitHub não configurado. Inicie sessão novamente." });
 
   const fileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/tarifarios.json`;
   const currentResponse = await fetch(fileUrl, { headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "User-Agent": "telecom-admin" } });

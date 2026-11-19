@@ -29,7 +29,11 @@ export default async function handler(req, res) {
   const allowed = (process.env.ADMIN_GITHUB_USERS || "").split(",").map(value => value.trim()).filter(Boolean);
   if (!allowed.includes(user.login)) return res.status(403).send("Conta não autorizada");
 
-  const payload = Buffer.from(JSON.stringify({ login: user.login, exp: Date.now() + 8 * 60 * 60 * 1000 })).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({
+    login: user.login,
+    accessToken: tokenData.access_token,
+    exp: Date.now() + 8 * 60 * 60 * 1000
+  })).toString("base64url");
   const signature = crypto.createHmac("sha256", clientSecret).update(payload).digest("base64url");
   res.setHeader("Set-Cookie", [
     "telecom_oauth_state=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",

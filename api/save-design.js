@@ -9,7 +9,9 @@ export default async function handler(req, res) {
   const crypto = await import("node:crypto");
   const [payload, signature] = decodeURIComponent(match[1]).split(".");
   const expected = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
-  if (!payload || !signature || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+  if (!payload || !signature) return res.status(401).json({ error: "Sessão inválida" });
+  if (Buffer.from(signature).length !== Buffer.from(expected).length ||
+      !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
     return res.status(401).json({ error: "Sessão inválida" });
   }
 
@@ -24,8 +26,8 @@ export default async function handler(req, res) {
 
   const owner = process.env.GITHUB_OWNER || "fabriciod15";
   const repo = process.env.GITHUB_REPO || "comparador-telecomunicacoes-portugal";
-  const token = process.env.GITHUB_TOKEN;
-  if (!owner || !repo || !token) return res.status(500).json({ error: "GitHub não configurado" });
+  const token = session.accessToken || process.env.GITHUB_TOKEN;
+  if (!owner || !repo || !token) return res.status(500).json({ error: "GitHub não configurado. Inicie sessão novamente." });
 
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/design.json`;
   const current = await fetch(url, { headers: { Authorization: `Bearer ${token}`, "User-Agent": "telecom-admin" } });

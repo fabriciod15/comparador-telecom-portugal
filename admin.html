@@ -126,7 +126,17 @@
             ${numberField("Instalação","custo_instalacao",item.custo_instalacao)}
             ${numberField("Oferta/voucher","oferta_voucher",item.oferta_voucher)}
             <div class="services"><strong>Serviços</strong>${["NET","TV","VOZ","MOVEL"].map(service => `<label><input type="checkbox" data-service="${service}" ${item.servicos?.includes(service)?"checked":""}> ${service}</label>`).join("")}</div>
-            <div class="customer-options"><strong>Tipo de cliente</strong>${["NOVOS","ATUAIS"].map(tipo => `<label><input type="checkbox" data-cliente="${tipo}" ${(!item.clientes || item.clientes.includes(tipo))?"checked":""}> ${tipo==="NOVOS"?"Novos clientes":"Clientes atuais"}</label>`).join("")}</div>
+            <div class="customer-options"><strong>Tipo de cliente</strong>${[
+              ["TODOS","Novos e atuais clientes"],
+              ["NOVOS","Novos clientes"],
+              ["ATUAIS","Clientes atuais"]
+            ].map(([tipo,nome]) => {
+              const clientes = item.clientes || ["NOVOS","ATUAIS"];
+              const checked = tipo==="TODOS"
+                ? clientes.includes("NOVOS") && clientes.includes("ATUAIS")
+                : clientes.length===1 && clientes.includes(tipo);
+              return `<label><input type="radio" name="clientes-${index}" data-cliente="${tipo}" ${checked?"checked":""}> ${nome}</label>`;
+            }).join("")}</div>
           </div>
           <div class="card-actions"><button class="danger" data-delete="${index}">Eliminar</button></div>
         </article>
@@ -142,7 +152,9 @@
           tariffs[index][field.dataset.key] = numberFields.includes(field.dataset.key) ? Number(value) : value;
         });
         tariffs[index].servicos = [...card.querySelectorAll("[data-service]:checked")].map(field => field.dataset.service);
-        tariffs[index].clientes = [...card.querySelectorAll("[data-cliente]:checked")].map(field => field.dataset.cliente);
+        const selected = card.querySelector("[data-cliente]:checked")?.dataset.cliente || "TODOS";
+        tariffs[index].clientes = selected==="TODOS" ? ["NOVOS","ATUAIS"] :
+          selected==="NOVOS" ? ["NOVOS"] : ["ATUAIS"];
       });
     }
 
