@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de tarifários</title>
+  <style>
+    :root { --ink:#14213d; --muted:#72809a; --line:#dde5f0; --blue:#246bfe; --surface:#fff; --canvas:#f4f7fb; --danger:#b42318; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--canvas); color:var(--ink); font-family:Inter,"Segoe UI",sans-serif; }
+    .top { background:var(--ink); color:#fff; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; }
+    .top h1 { margin:0; font-size:18px; }
+    main { width:min(1180px,calc(100% - 32px)); margin:24px auto 60px; }
+    .panel { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
+    .auth { display:grid; grid-template-columns:1fr 1fr auto; gap:10px; align-items:end; }
+    label { display:flex; flex-direction:column; gap:5px; color:#40516f; font-size:12px; font-weight:800; }
+    input, select { width:100%; height:40px; border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:#fff; color:var(--ink); }
+    button { height:40px; border:0; border-radius:8px; padding:0 14px; background:var(--blue); color:#fff; font-weight:800; cursor:pointer; }
+    button.secondary { background:#edf2f8; color:var(--ink); }
+    button.danger { background:#fff; color:var(--danger); border:1px solid #f1b8b3; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+    .cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .card { border:1px solid var(--line); border-radius:12px; padding:14px; background:#fff; }
+    .card h3 { margin:0 0 12px; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+    .services { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px; }
+    .services label { flex-direction:row; align-items:center; }
+    .services input { width:16px; height:16px; }
+    .card-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+    .status { min-height:20px; margin-top:10px; color:var(--muted); font-size:13px; }
+    .status.error { color:var(--danger); }
+    @media(max-width:800px){ .auth,.cards { grid-template-columns:1fr; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  </style>
+</head>
+<body>
+  <div class="top"><h1>Editor de tarifários</h1><a href="./" style="color:#fff">Ver website</a></div>
+  <main>
+    <section class="panel">
+      <div class="auth">
+        <label>Repositório<input id="repo" value="fabriciod15/comparador-telecom-portugal"></label>
+        <label>Token GitHub<input id="token" type="password" placeholder="GitHub fine-grained PAT"></label>
+        <button id="load">Abrir editor</button>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+    <section class="panel">
+      <div class="toolbar"><strong id="count">0 tarifários</strong><button id="add">Adicionar tarifário</button></div>
+      <div class="cards" id="cards"></div>
+      <div class="toolbar" style="justify-content:flex-end;margin:16px 0 0"><button class="secondary" id="save-local">Guardar alterações locais</button><button id="save-github">Publicar no GitHub</button></div>
+    </section>
+  </main>
+  <script>
+    const operatorNames = ["Amigo","DIGI","MEO","Moche","NOS","UZO","Vodafone","WOO","WTF","Yorn"];
+    let tariffs = [];
+    let sha = null;
+
+    function status(message, error=false) {
+      const node = document.getElementById("status");
+      node.textContent = message;
+      node.className = "status" + (error ? " error" : "");
+    }
+
+    function numberField(label, key, value) {
+      return `<label>${label}<input type="number" step="any" data-key="${key}" value="${value ?? 0}"></label>`;
+    }
+
+    function textField(label, key, value) {
+      return `<label>${label}<input type="text" data-key="${key}" value="${String(value ?? "").replace(/"/g,"&quot;")}"></label>`;
+    }
+
+    function render() {
+      document.getElementById("count").textContent = `${tariffs.length} tarifário${tariffs.length === 1 ? "" : "s"}`;
+      document.getElementById("cards").innerHTML = tariffs.map((item,index) => `
+        <article class="card" data-index="${index}">
+          <h3>${index + 1}. ${item.nome || "Novo tarifário"}</h3>
+          <div class="grid">
+            ${textField("Nome do tarifário","nome",item.nome)}
+            ${textField("Tipo","tipo",item.tipo)}
+            <label>Operadora<select data-key="operadora">${operatorNames.map(name => `<option ${item.operadora===name?"selected":""}>${name}</option>`).join("")}</select></label>
+            <label>Categoria<select data-key="categoria"><option ${item.categoria==="CASA"?"selected":""}>CASA</option><option ${item.categoria==="MOVEL"?"selected":""}>MOVEL</option></select></label>
+            ${numberField("Fibra Mbps","fibra_mbps",item.fibra_mbps)}
+            ${numberField("Canais TV","tv_canais",item.tv_canais)}
+            ${numberField("Cartões móveis","cartoes_moveis",item.cartoes_moveis)}
+            ${numberField("Dados nacionais GB","dados_gb",item.dados_gb)}
+            ${textField("Dados roaming UE","dados_roaming",item.dados_roaming)}
+            ${textField("Minutos","minutos",item.minutos)}
+            ${textField("SMS","sms",item.sms)}
+            ${numberField("Fidelização meses","fidelizacao_meses",item.fidelizacao_meses)}
+            ${numberField("Mensalidade base","mensalidade_base",item.mensalidade_base)}
+            ${numberField("Mensalidade promo","mensalidade_promo",item.mensalidade_promo)}
+            ${numberField("Meses promo","meses_promo",item.meses_promo)}
+            ${numberField("Instalação","custo_instalacao",item.custo_instalacao)}
+            ${numberField("Oferta/voucher","oferta_voucher",item.oferta_voucher)}
+            <div class="services"><strong>Serviços</strong>${["NET","TV","VOZ","MOVEL"].map(service => `<label><input type="checkbox" data-service="${service}" ${item.servicos?.includes(service)?"checked":""}> ${service}</label>`).join("")}</div>
+          </div>
+          <div class="card-actions"><button class="danger" data-delete="${index}">Eliminar</button></div>
+        </article>
+      `).join("");
+    }
+
+    function collect() {
+      document.querySelectorAll(".card").forEach(card => {
+        const index = Number(card.dataset.index);
+        [...card.querySelectorAll("[data-key]")].forEach(field => {
+          const value = field.value;
+          const numberFields = ["fibra_mbps","tv_canais","cartoes_moveis","dados_gb","fidelizacao_meses","mensalidade_base","mensalidade_promo","meses_promo","custo_instalacao","oferta_voucher"];
+          tariffs[index][field.dataset.key] = numberFields.includes(field.dataset.key) ? Number(value) : value;
+        });
+        tariffs[index].servicos = [...card.querySelectorAll("[data-service]:checked")].map(field => field.dataset.service);
+      });
+    }
+
+    async function loadFromGitHub() {
+      const repo = document.getElementById("repo").value.trim();
+      status("A abrir...");
+      try {
+        const response = await fetch(`https://api.github.com/repos/${repo}/contents/tarifarios.json`);
+        if (!response.ok) throw new Error("Não foi possível abrir tarifarios.json");
+        const data = await response.json();
+        sha = data.sha;
+        const bytes = Uint8Array.from(atob(data.content.replace(/\n/g,"")), char => char.charCodeAt(0));
+        tariffs = JSON.parse(new TextDecoder().decode(bytes));
+        render();
+        status(`${tariffs.length} tarifários carregados.`);
+      } catch (error) { status(error.message, true); }
+    }
+
+    function b64Encode(value) {
+      const bytes = new TextEncoder().encode(value);
+      let binary = "";
+      bytes.forEach(byte => binary += String.fromCharCode(byte));
+      return btoa(binary);
+    }
+
+    async function saveToGitHub() {
+      collect();
+      const repo = document.getElementById("repo").value.trim();
+      const token = document.getElementById("token").value.trim();
+      if (!token) { status("Indica o token GitHub.", true); return; }
+      status("A publicar...");
+      try {
+        let currentSha = sha;
+        if (!currentSha) {
+          const current = await fetch(`https://api.github.com/repos/${repo}/contents/tarifarios.json`);
+          if (current.ok) currentSha = (await current.json()).sha;
+        }
+        const response = await fetch(`https://api.github.com/repos/${repo}/contents/tarifarios.json`, {
+          method:"PUT",
+          headers:{ "Authorization":"Bearer "+token, "Accept":"application/vnd.github+json", "Content-Type":"application/json" },
+          body:JSON.stringify({ message:"Atualizar tarifários", content:b64Encode(JSON.stringify(tariffs,null,2)), ...(currentSha ? {sha:currentSha} : {}) })
+        });
+        if (!response.ok) throw new Error((await response.json()).message || "Não foi possível publicar");
+        const result = await response.json();
+        sha = result.content.sha;
+        status("Publicação concluída. O GitHub Pages será atualizado automaticamente.");
+      } catch (error) { status(error.message, true); }
+    }
+
+    document.getElementById("load").addEventListener("click", loadFromGitHub);
+    document.getElementById("add").addEventListener("click", () => {
+      collect();
+      tariffs.push({ categoria:"CASA",servicos:["NET"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:0,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
+      render();
+    });
+    document.getElementById("cards").addEventListener("click", event => {
+      if (!event.target.dataset.delete) return;
+      collect();
+      tariffs.splice(Number(event.target.dataset.delete),1);
+      render();
+    });
+    document.getElementById("save-local").addEventListener("click", () => {
+      collect();
+      localStorage.setItem("tarifarios-editor",JSON.stringify(tariffs));
+      status("Alterações guardadas neste browser.");
+    });
+    document.getElementById("save-github").addEventListener("click", saveToGitHub);
+  </script>
+</body>
+</html>
