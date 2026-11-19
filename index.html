@@ -904,6 +904,9 @@
       const resultados = todosTarifarios
         .filter(t => {
           if (tabAtiva === "TODOS") return true;
+          if (Array.isArray(t.abas) && t.abas.length > 0) {
+            return t.abas.includes(tabAtiva);
+          }
           if (tabAtiva === "MOVEL") return t.categoria === "MOVEL";
           if (tabAtiva === "NET") return t.servicos.includes("NET") && t.servicos.length === 1;
           if (tabAtiva === "NET_MOVEL") return t.servicos.includes("NET") && t.servicos.includes("MOVEL") && t.servicos.length === 2;
