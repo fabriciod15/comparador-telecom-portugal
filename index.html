@@ -1052,7 +1052,7 @@
           })
           .then(tarifarios => {
             todosTarifarios = tarifarios;
-            carregarTarifarios();
+            atualizarVista();
           })
           .catch(error => {
             console.error(error);
@@ -1092,7 +1092,7 @@
       document.getElementById("filtro-dados").value = "0";
       document.getElementById("filtro-fidelizacao").value = "24";
       document.getElementById("filtro-tv").value = "TODOS";
-      atualizarVista();
+      carregarTarifarios();
     });
 
     function atualizarComparacao() {
