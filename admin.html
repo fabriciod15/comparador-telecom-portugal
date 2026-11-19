@@ -37,9 +37,9 @@
   <main>
     <section class="panel">
       <div class="auth">
-        <label>Repositório<input id="repo" value="fabriciod15/comparador-telecom-portugal"></label>
-        <label>Token GitHub<input id="token" type="password" placeholder="GitHub fine-grained PAT"></label>
-        <button id="load">Abrir editor</button>
+        <label>Repositório<input id="repo" value="fabriciod15/comparador-telecom-portugal" readonly></label>
+        <label>Estado da sessão<input id="session-status" value="Não autenticado" readonly></label>
+        <button id="login">Entrar com GitHub</button>
       </div>
       <div class="status" id="status"></div>
     </section>
@@ -125,38 +125,36 @@
       } catch (error) { status(error.message, true); }
     }
 
-    function b64Encode(value) {
-      const bytes = new TextEncoder().encode(value);
-      let binary = "";
-      bytes.forEach(byte => binary += String.fromCharCode(byte));
-      return btoa(binary);
-    }
-
     async function saveToGitHub() {
       collect();
-      const repo = document.getElementById("repo").value.trim();
-      const token = document.getElementById("token").value.trim();
-      if (!token) { status("Indica o token GitHub.", true); return; }
       status("A publicar...");
       try {
-        let currentSha = sha;
-        if (!currentSha) {
-          const current = await fetch(`https://api.github.com/repos/${repo}/contents/tarifarios.json`);
-          if (current.ok) currentSha = (await current.json()).sha;
-        }
-        const response = await fetch(`https://api.github.com/repos/${repo}/contents/tarifarios.json`, {
+        const response = await fetch("/api/save", {
           method:"PUT",
-          headers:{ "Authorization":"Bearer "+token, "Accept":"application/vnd.github+json", "Content-Type":"application/json" },
-          body:JSON.stringify({ message:"Atualizar tarifários", content:b64Encode(JSON.stringify(tariffs,null,2)), ...(currentSha ? {sha:currentSha} : {}) })
+          headers:{ "Content-Type":"application/json" },
+          body:JSON.stringify(tariffs)
         });
         if (!response.ok) throw new Error((await response.json()).message || "Não foi possível publicar");
-        const result = await response.json();
-        sha = result.content.sha;
         status("Publicação concluída. O GitHub Pages será atualizado automaticamente.");
       } catch (error) { status(error.message, true); }
     }
 
-    document.getElementById("load").addEventListener("click", loadFromGitHub);
+    async function checkSession() {
+      const response = await fetch("/api/me");
+      if (response.ok) {
+        const data = await response.json();
+        document.getElementById("session-status").value = `Autenticado como ${data.login}`;
+        document.getElementById("login").textContent = "Atualizar sessão";
+        await loadFromGitHub();
+      } else {
+        document.getElementById("session-status").value = "Não autenticado";
+        document.getElementById("login").textContent = "Entrar com GitHub";
+      }
+    }
+
+    document.getElementById("login").addEventListener("click", () => {
+      location.href = "/api/auth/login";
+    });
     document.getElementById("add").addEventListener("click", () => {
       collect();
       tariffs.push({ categoria:"CASA",servicos:["NET"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:0,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
@@ -174,6 +172,7 @@
       status("Alterações guardadas neste browser.");
     });
     document.getElementById("save-github").addEventListener("click", saveToGitHub);
+    checkSession();
   </script>
 </body>
 </html>
