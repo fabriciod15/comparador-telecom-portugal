@@ -865,11 +865,13 @@
 
     function calcularCusto24Meses(t) {
       const periodo = 24;
-      const mesesPromo = Math.min(t.meses_promo, periodo);
+      const base = Number(t.mensalidade_base ?? t.mensalidade_promo ?? 0);
+      const promo = Number(t.mensalidade_promo ?? t.mensalidade_base ?? 0);
+      const mesesPromo = t.meses_promo == null ? 0 : Math.min(Number(t.meses_promo), periodo);
       const custoMensalidades =
-        (mesesPromo * t.mensalidade_promo) +
-        ((periodo - mesesPromo) * t.mensalidade_base);
-      const custoTotal = custoMensalidades + t.custo_instalacao - t.oferta_voucher;
+        (mesesPromo * promo) +
+        ((periodo - mesesPromo) * base);
+      const custoTotal = custoMensalidades + Number(t.custo_instalacao || 0) - Number(t.oferta_voucher || 0);
       return { total24m:custoTotal, mediaMensal:custoTotal / periodo };
     }
 
@@ -894,8 +896,8 @@
         })
         .filter(t => todasSelecionadas || operadorasSelecionadas.includes(t.operadora))
         .filter(t => t.fibra_mbps >= fibraMin)
-        .filter(t => t.dados_gb >= dadosMin)
-        .filter(t => t.fidelizacao_meses <= fidMax)
+        .filter(t => t.dados_gb == null ? dadosMin === 0 : t.dados_gb >= dadosMin)
+        .filter(t => t.fidelizacao_meses == null || t.fidelizacao_meses <= fidMax)
         .filter(t => tvFiltro === "COM_TV" ? t.tv_canais > 0 : tvFiltro === "SEM_TV" ? t.tv_canais === 0 : true)
         .map(t => ({ ...t, calculo:calcularCusto24Meses(t) }))
         .sort((a, b) => a.calculo.mediaMensal - b.calculo.mediaMensal);
@@ -916,17 +918,20 @@
         const conhecida = ["DIGI","WOO","MEO","Vodafone","NOS","Amigo","UZO","Moche","Yorn","WTF"].includes(item.operadora);
         const classeOp = conhecida ? "op-" + item.operadora : "op-default";
 
+        const precoBase = Number(item.mensalidade_base ?? item.mensalidade_promo ?? 0);
+        const precoPromo = Number(item.mensalidade_promo ?? item.mensalidade_base ?? 0);
         const textoPromo = item.meses_promo > 0
-          ? `${item.mensalidade_promo.toFixed(2).replace(".", ",")} € nos primeiros ${item.meses_promo} meses, depois ${item.mensalidade_base.toFixed(2).replace(".", ",")} €`
-          : `Mensalidade fixa de ${item.mensalidade_base.toFixed(2).replace(".", ",")} €`;
+          ? `${precoPromo.toFixed(2).replace(".", ",")} € nos primeiros ${item.meses_promo} meses, depois ${precoBase.toFixed(2).replace(".", ",")} €`
+          : `Mensalidade fixa de ${precoBase.toFixed(2).replace(".", ",")} €`;
         const textoVoucher = item.oferta_voucher > 0
           ? `<br>Oferta/voucher: −${item.oferta_voucher.toFixed(2).replace(".", ",")} €`
           : "";
 
+        const dadosTexto = item.dados_gb == null ? "Dados ilimitados" : item.dados_gb + " GB dados móveis";
         const specs = item.categoria === "MOVEL"
-          ? `<span class="spec-pill">${item.dados_gb} GB dados móveis</span>
+          ? `<span class="spec-pill">${dadosTexto}</span>
              <span class="spec-pill">Chamadas e SMS incluídos</span>
-             <span class="spec-pill">${item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses fidelização"}</span>
+             <span class="spec-pill">${item.fidelizacao_meses == null ? "Fidelização não confirmada" : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses fidelização"}</span>
              <span class="spec-pill">Em Portugal</span>`
           : `<span class="spec-pill">Fibra ${item.fibra_mbps >= 1000 ? "1 Gbps" : item.fibra_mbps + " Mbps"}</span>
              <span class="spec-pill">${item.tv_canais > 0 ? item.tv_canais + " canais TV" : "Sem TV"}</span>
@@ -1106,7 +1111,7 @@
           </td>
           <td>${t.minutos || "—"}</td>
           <td>${t.sms || "—"}</td>
-          <td>${t.fidelizacao_meses === 0 ? "Sem fidelização" : t.fidelizacao_meses + " meses"}</td>
+          <td>${t.fidelizacao_meses == null ? "Não confirmada" : t.fidelizacao_meses === 0 ? "Sem fidelização" : t.fidelizacao_meses + " meses"}</td>
         </tr>
       `).join("");
 
