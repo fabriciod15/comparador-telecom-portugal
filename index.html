@@ -1005,6 +1005,19 @@
 
     document.querySelectorAll("select").forEach(sel => sel.addEventListener("change", atualizarVista));
 
+    async function carregarTarifarios() {
+      try {
+        const response = await fetch("tarifarios.json?v=" + Date.now());
+        if (!response.ok) throw new Error("Não foi possível carregar tarifarios.json");
+        todosTarifarios = await response.json();
+        carregarTarifarios();
+      } catch (error) {
+        console.error(error);
+        document.getElementById("lista-resultados").innerHTML =
+          '<div class="empty-state">Não foi possível carregar os tarifários.</div>';
+      }
+    }
+
     const operatorPicker = document.getElementById("operator-picker");
     const operatorTrigger = document.getElementById("operator-trigger");
 

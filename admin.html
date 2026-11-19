@@ -165,7 +165,8 @@
           headers:{ "Content-Type":"application/json" },
           body:JSON.stringify(tariffs)
         });
-        if (!response.ok) throw new Error((await response.json()).message || "Não foi possível publicar");
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || data.message || "Não foi possível publicar");
         status("Publicação concluída. O GitHub Pages será atualizado automaticamente.");
       } catch (error) { status(error.message, true); }
     }
