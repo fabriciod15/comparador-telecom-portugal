@@ -1236,9 +1236,9 @@
               <tr>
                 <th>Tarifário</th>
                 ${tabAtiva === "MOVEL"
-                  ? `<th><button class="table-sort" type="button" data-sort="DADOS_NACIONAIS">Dados móveis nacionais <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
-                     <th><button class="table-sort" type="button" data-sort="DADOS_ROAMING">Dados móveis roaming <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
-                     <th><button class="table-sort" type="button" data-sort="CHAMADAS_SMS">Chamadas e SMS <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`
+                  ? `<th><button class="table-sort" type="button" data-sort="DADOS_NACIONAIS">Nacionais <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
+                     <th><button class="table-sort" type="button" data-sort="DADOS_ROAMING">Roaming <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
+                     <th><button class="table-sort" type="button" data-sort="CHAMADAS_SMS">Chamadas/SMS <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`
                   : `<th><button class="table-sort" type="button" data-sort="CARACTERISTICAS">Características <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`}
                 <th><button class="table-sort" type="button" data-sort="FIDELIZACAO">Fidelização <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
                 <th><button class="table-sort" type="button" data-sort="MENSALIDADE">Mensalidade <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
@@ -1291,7 +1291,7 @@
           ? `<br>Oferta/voucher: −${item.oferta_voucher.toFixed(2).replace(".", ",")} €`
           : "";
 
-        const dadosTexto = item.dados_gb == null ? "Dados ilimitados" : item.dados_gb + " GB dados móveis";
+        const dadosTexto = item.dados_gb == null ? "Ilimitado" : item.dados_gb + " GB";
         const fonteSegura = linkSeguroTarifario(item.fonte);
         const tituloTarifario = fonteSegura
           ? `<a class="pacote-titulo-link" href="${fonteSegura}" target="_blank" rel="noopener noreferrer">${item.nome}</a>`
