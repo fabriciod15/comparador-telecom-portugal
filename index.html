@@ -1237,7 +1237,9 @@
         .filter(t => todasSelecionadas || operadorasSelecionadas.includes(t.operadora))
         .filter(t => {
           if (tipoClienteSelecionado === "TODOS") return true;
-          return Array.isArray(t.clientes) && t.clientes.includes(tipoClienteSelecionado);
+          if (!Array.isArray(t.clientes) || !t.clientes.includes(tipoClienteSelecionado)) return false;
+          const outroTipo = tipoClienteSelecionado === "NOVOS" ? "ATUAIS" : "NOVOS";
+          return !t.clientes.includes(outroTipo);
         })
         .filter(t => t.fibra_mbps >= fibraMin)
         .filter(t => dadosFiltro === "ILIMITADO"
