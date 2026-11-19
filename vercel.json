@@ -5,6 +5,7 @@
     { "source": "/api/auth/login", "destination": "/api/auth/login" },
     { "source": "/api/logout", "destination": "/api/logout" },
     { "source": "/api/me", "destination": "/api/me" },
-    { "source": "/api/save", "destination": "/api/save" }
+    { "source": "/api/save", "destination": "/api/save" },
+    { "source": "/api/save-design", "destination": "/api/save-design" }
   ]
 }
