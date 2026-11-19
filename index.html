@@ -781,6 +781,21 @@
       color: var(--blue);
     }
 
+    .sort-priority {
+      min-width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .sort-priority[hidden] { display: none; }
+
     .tariff-row {
       border-bottom: 1px solid var(--line);
       transition: background 140ms, box-shadow 140ms;
@@ -1103,7 +1118,7 @@
     let todosTarifarios = [];
 
     let tabAtiva = "TODOS";
-    let ordenacaoTabela = { chave: "MENSALIDADE", direcao: "ASC" };
+    let ordenacoesTabela = [{ chave: "MENSALIDADE", direcao: "ASC" }];
     const tarifariosSelecionados = new Set();
 
     function linkSeguroTarifario(url) {
@@ -1121,6 +1136,22 @@
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;");
+    }
+
+    function valorDadosRoaming(valor) {
+      const texto = String(valor || "").toLowerCase();
+      if (texto.includes("ilimit")) return Number.POSITIVE_INFINITY;
+      const match = texto.match(/([0-9]+(?:[.,][0-9]+)?)\s*(gb|mb)/);
+      if (!match) return 0;
+      const quantidade = Number(match[1].replace(",", "."));
+      return match[2] === "mb" ? quantidade / 1000 : quantidade;
+    }
+
+    function valorChamadasSMS(item) {
+      const textos = [item.minutos, item.sms].join(" ").toLowerCase();
+      if (textos.includes("ilimit")) return Number.POSITIVE_INFINITY;
+      const numeros = [...textos.matchAll(/([0-9]+)/g)].map(match => Number(match[1]));
+      return numeros.length ? Math.max(...numeros) : 0;
     }
 
     function atualizarVista() {
@@ -1160,20 +1191,34 @@
         .filter(t => t.fidelizacao_meses == null || t.fidelizacao_meses <= fidMax)
         .filter(t => tvFiltro === "COM_TV" ? t.tv_canais > 0 : tvFiltro === "SEM_TV" ? t.tv_canais === 0 : true)
         .sort((a, b) => {
-          let valorA;
-          let valorB;
-          if (ordenacaoTabela.chave === "FIDELIZACAO") {
-            valorA = a.fidelizacao_meses == null ? Number.POSITIVE_INFINITY : Number(a.fidelizacao_meses);
-            valorB = b.fidelizacao_meses == null ? Number.POSITIVE_INFINITY : Number(b.fidelizacao_meses);
-          } else if (ordenacaoTabela.chave === "CARACTERISTICAS") {
-            valorA = a.dados_gb == null ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
-            valorB = b.dados_gb == null ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
-          } else {
-            valorA = Number(a.mensalidade_promo ?? a.mensalidade_base ?? 0);
-            valorB = Number(b.mensalidade_promo ?? b.mensalidade_base ?? 0);
+          for (const regra of ordenacoesTabela) {
+            let valorA;
+            let valorB;
+            if (regra.chave === "FIDELIZACAO") {
+              valorA = a.fidelizacao_meses == null ? Number.POSITIVE_INFINITY : Number(a.fidelizacao_meses);
+              valorB = b.fidelizacao_meses == null ? Number.POSITIVE_INFINITY : Number(b.fidelizacao_meses);
+            } else if (regra.chave === "DADOS_NACIONAIS") {
+              valorA = a.dados_gb == null ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
+              valorB = b.dados_gb == null ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
+            } else if (regra.chave === "DADOS_ROAMING") {
+              valorA = valorDadosRoaming(a.dados_roaming);
+              valorB = valorDadosRoaming(b.dados_roaming);
+            } else if (regra.chave === "CHAMADAS_SMS") {
+              valorA = valorChamadasSMS(a);
+              valorB = valorChamadasSMS(b);
+            } else if (regra.chave === "CARACTERISTICAS") {
+              valorA = a.dados_gb == null ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
+              valorB = b.dados_gb == null ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
+            } else {
+              valorA = Number(a.mensalidade_promo ?? a.mensalidade_base ?? 0);
+              valorB = Number(b.mensalidade_promo ?? b.mensalidade_base ?? 0);
+            }
+            if (valorA !== valorB) {
+              const direcao = regra.direcao === "ASC" ? 1 : -1;
+              return (valorA - valorB) * direcao;
+            }
           }
-          const direcao = ordenacaoTabela.direcao === "ASC" ? 1 : -1;
-          return (valorA - valorB) * direcao;
+          return a.nome.localeCompare(b.nome, "pt");
         });
 
       const container = document.getElementById("lista-resultados");
@@ -1192,9 +1237,13 @@
             <thead>
               <tr>
                 <th>Tarifário</th>
-                <th><button class="table-sort" type="button" data-sort="CARACTERISTICAS">Características <span class="sort-arrow"></span></button></th>
-                <th><button class="table-sort" type="button" data-sort="FIDELIZACAO">Fidelização <span class="sort-arrow"></span></button></th>
-                <th><button class="table-sort" type="button" data-sort="MENSALIDADE">Mensalidade <span class="sort-arrow"></span></button></th>
+                ${tabAtiva === "MOVEL"
+                  ? `<th><button class="table-sort" type="button" data-sort="DADOS_NACIONAIS">Dados móveis nacionais <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
+                     <th><button class="table-sort" type="button" data-sort="DADOS_ROAMING">Dados móveis roaming <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
+                     <th><button class="table-sort" type="button" data-sort="CHAMADAS_SMS">Chamadas e SMS <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`
+                  : `<th><button class="table-sort" type="button" data-sort="CARACTERISTICAS">Características <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`}
+                <th><button class="table-sort" type="button" data-sort="FIDELIZACAO">Fidelização <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
+                <th><button class="table-sort" type="button" data-sort="MENSALIDADE">Mensalidade <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -1205,14 +1254,26 @@
       container.querySelectorAll("[data-sort]").forEach(button => {
         const chave = button.dataset.sort;
         const arrow = button.querySelector(".sort-arrow");
-        if (ordenacaoTabela.chave === chave) {
-          arrow.textContent = ordenacaoTabela.direcao === "ASC" ? "↑" : "↓";
+        const priority = button.querySelector(".sort-priority");
+        const regra = ordenacoesTabela.findIndex(item => item.chave === chave);
+        if (regra >= 0) {
+          const direcao = ordenacoesTabela[regra].direcao;
+          arrow.textContent = direcao === "ASC" ? "↑" : "↓";
+          priority.hidden = false;
+          priority.textContent = String(regra + 1);
+        } else {
+          arrow.textContent = "";
+          priority.hidden = true;
         }
         button.addEventListener("click", () => {
-          ordenacaoTabela = {
-            chave,
-            direcao: ordenacaoTabela.chave === chave && ordenacaoTabela.direcao === "ASC" ? "DESC" : "ASC",
-          };
+          const indice = ordenacoesTabela.findIndex(item => item.chave === chave);
+          if (indice < 0) {
+            ordenacoesTabela.push({ chave, direcao: "ASC" });
+          } else if (ordenacoesTabela[indice].direcao === "ASC") {
+            ordenacoesTabela[indice].direcao = "DESC";
+          } else {
+            ordenacoesTabela.splice(indice, 1);
+          }
           atualizarVista();
         });
       });
@@ -1238,15 +1299,20 @@
           ? `<a class="pacote-titulo-link" href="${fonteSegura}" target="_blank" rel="noopener noreferrer">${item.nome}</a>`
           : item.nome;
         const caracteristicas = item.categoria === "MOVEL"
-          ? `<span class="tariff-feature">${dadosTexto}</span>
-             <span class="tariff-feature-muted">Chamadas e SMS incluídos</span>
-             <span class="tariff-feature-muted">Em Portugal</span>`
+          ? ""
           : `<span class="tariff-feature">Fibra ${item.fibra_mbps >= 1000 ? (item.fibra_mbps === 10000 ? "10 Gbps" : "1 Gbps") : item.fibra_mbps + " Mbps"}</span>
              <span class="tariff-feature-muted">${item.tv_canais > 0 ? item.tv_canais + " canais TV" : "Sem TV"}</span>
              <span class="tariff-feature-muted">${item.cartoes_moveis || 0} cartão${Number(item.cartoes_moveis) === 1 ? "" : "s"} móvel${item.dados_gb != null && item.dados_gb > 0 ? " · " + item.dados_gb + " GB" : ""}</span>`;
         const fidelizacao = item.fidelizacao_meses == null
           ? "Não confirmada"
           : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses";
+        const dadosRoaming = item.dados_roaming && String(item.dados_roaming).trim()
+          ? escaparHtml(item.dados_roaming)
+          : "Não confirmado";
+        const chamadasSms = [
+          item.minutos ? escaparHtml(item.minutos) : "",
+          item.sms ? escaparHtml(item.sms) : "",
+        ].filter(Boolean).join("<br>");
 
         row.innerHTML =
           `<td class="tariff-name">
@@ -1255,7 +1321,11 @@
              <h2>${tituloTarifario}</h2>
              <div class="tariff-type">${escaparHtml(item.tipo)}</div>
            </td>
-           <td>${caracteristicas}</td>
+           ${tabAtiva === "MOVEL"
+             ? `<td><span class="tariff-feature">${escaparHtml(dadosTexto)}</span></td>
+                <td><span class="tariff-feature">${dadosRoaming}</span></td>
+                <td><span class="tariff-feature">${chamadasSms || "Não confirmado"}</span></td>`
+             : `<td>${caracteristicas}</td>`}
            <td>${escaparHtml(fidelizacao)}</td>
            <td>
              <div class="tariff-monthly">${precoPromo.toFixed(2).replace(".", ",")} € <small>/mês</small></div>
@@ -1288,6 +1358,7 @@
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         tabAtiva = btn.dataset.tab;
+        ordenacoesTabela = [{ chave: "MENSALIDADE", direcao: "ASC" }];
 
         const campoFibra = document.getElementById("campo-fibra");
         const campoTv = document.getElementById("campo-tv");
@@ -1434,7 +1505,7 @@
       document.getElementById("filtro-dados").value = "0";
       document.getElementById("filtro-fidelizacao").value = "24";
       document.getElementById("filtro-tv").value = "TODOS";
-      ordenacaoTabela = { chave: "MENSALIDADE", direcao: "ASC" };
+      ordenacoesTabela = [{ chave: "MENSALIDADE", direcao: "ASC" }];
       carregarTarifarios();
     });
 
