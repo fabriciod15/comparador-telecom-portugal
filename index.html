@@ -214,130 +214,6 @@
 
     .main { padding: 30px 0 60px; }
 
-    .service-picker {
-      margin-bottom: 14px;
-    }
-
-    .personalized-panel {
-      display: none;
-      margin-bottom: 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--surface);
-      padding: 14px;
-    }
-
-    .personalized-panel.visible { display: block; }
-
-    .personalized-title {
-      margin: 0 0 10px;
-      font-size: 14px;
-    }
-
-    .personalized-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .personalized-option {
-      min-height: 42px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: #fbfdff;
-      color: var(--ink-2);
-      padding: 8px 11px;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .personalized-option:has(input:checked) {
-      border-color: var(--blue);
-      background: var(--blue-soft);
-      color: var(--blue-dark);
-    }
-
-    .personalized-option input {
-      accent-color: var(--blue);
-    }
-
-    .picker-label {
-      display: block;
-      margin-bottom: 9px;
-      color: var(--ink);
-      font-size: 14px;
-      font-weight: 850;
-    }
-
-    .service-options {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .service-option {
-      min-height: 78px;
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--surface);
-      color: var(--ink);
-      padding: 12px;
-      text-align: left;
-      cursor: pointer;
-      transition: border-color 160ms, background 160ms, box-shadow 160ms;
-    }
-
-    .service-option:hover {
-      border-color: #b3c5df;
-      box-shadow: 0 7px 18px rgba(20, 33, 61, 0.06);
-    }
-
-    .service-option.active {
-      border: 2px solid var(--blue);
-      background: var(--blue-soft);
-      box-shadow: 0 7px 18px rgba(36, 107, 254, 0.08);
-    }
-
-    .service-icon {
-      width: 42px;
-      height: 42px;
-      flex: 0 0 42px;
-      display: grid;
-      place-items: center;
-      border-radius: 10px;
-      background: #edf2f8;
-      color: var(--ink-2);
-      font-size: 17px;
-      font-weight: 900;
-    }
-
-    .service-option.active .service-icon {
-      background: var(--blue);
-      color: #fff;
-    }
-
-    .service-copy strong,
-    .service-copy span {
-      display: block;
-    }
-
-    .service-copy strong {
-      font-size: 13px;
-    }
-
-    .service-copy span {
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
     .filters {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -592,7 +468,6 @@
 
     @media (max-width: 900px) {
       .filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .service-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .trust-panel { display: none; }
       .hero-inner { min-height: 205px; }
       .cartao-pacote { grid-template-columns: 1.3fr 1.4fr 0.8fr; }
@@ -657,7 +532,6 @@
         <button class="tab-btn" data-tab="NET_MOVEL">Net + Móvel</button>
         <button class="tab-btn" data-tab="TV_NET_VOZ">TV + Net + Voz</button>
         <button class="tab-btn" data-tab="TV_NET_VOZ_MOVEL">TV + Net + Voz + Móvel</button>
-        <button class="tab-btn" data-tab="PERSONALIZADO">Personalizado</button>
       </div>
     </div>
   </nav>
@@ -677,16 +551,6 @@
   </header>
 
   <main class="container main">
-    <section class="personalized-panel" id="personalized-panel" aria-label="Selecionar serviços">
-      <h2 class="personalized-title">Seleciona individualmente os serviços que precisas</h2>
-      <div class="personalized-options">
-        <label class="personalized-option"><input type="checkbox" value="NET"> Net / Fibra</label>
-        <label class="personalized-option"><input type="checkbox" value="TV"> Televisão</label>
-        <label class="personalized-option"><input type="checkbox" value="VOZ"> Voz fixa</label>
-        <label class="personalized-option"><input type="checkbox" value="MOVEL"> Móvel</label>
-      </div>
-    </section>
-
     <section class="filters" aria-label="Filtros">
       <div class="campo">
         <label for="filtro-operadora">Operadora</label>
@@ -799,10 +663,6 @@
           if (tabAtiva === "NET_MOVEL") return t.servicos.includes("NET") && t.servicos.includes("MOVEL") && t.servicos.length === 2;
           if (tabAtiva === "TV_NET_VOZ") return t.servicos.includes("TV") && t.servicos.includes("NET") && t.servicos.includes("VOZ") && !t.servicos.includes("MOVEL");
           if (tabAtiva === "TV_NET_VOZ_MOVEL") return t.servicos.includes("TV") && t.servicos.includes("NET") && t.servicos.includes("VOZ") && t.servicos.includes("MOVEL");
-          if (tabAtiva === "PERSONALIZADO") {
-            const selecionados = [...document.querySelectorAll("#personalized-panel input:checked")].map(input => input.value);
-            return selecionados.length === 0 || selecionados.every(servico => t.servicos.includes(servico));
-          }
           return true;
         })
         .filter(t => operadora === "TODAS" || t.operadora === operadora)
@@ -874,7 +734,6 @@
         const campoTv = document.getElementById("campo-tv");
         const titulo = document.getElementById("titulo-pagina");
         const descricao = document.getElementById("descricao-pagina");
-        document.getElementById("personalized-panel").classList.toggle("visible", tabAtiva === "PERSONALIZADO");
 
         if (tabAtiva === "MOVEL") {
           titulo.textContent = "Encontra o melhor tarifário móvel";
@@ -883,11 +742,6 @@
           campoTv.classList.add("oculto");
           document.getElementById("filtro-fibra").value = "0";
           document.getElementById("filtro-tv").value = "TODOS";
-        } else if (tabAtiva === "PERSONALIZADO") {
-          titulo.textContent = "Cria uma combinação à tua medida";
-          descricao.textContent = "Seleciona os serviços que queres e encontra a melhor opção disponível.";
-          campoFibra.classList.remove("oculto");
-          campoTv.classList.remove("oculto");
         } else {
           titulo.textContent = tabAtiva === "NET"
             ? "Encontra o melhor serviço de fibra"
@@ -905,10 +759,6 @@
         atualizarVista();
       });
     });
-
-    document.querySelectorAll("#personalized-panel input").forEach(input =>
-      input.addEventListener("change", atualizarVista)
-    );
 
     document.querySelectorAll("select").forEach(sel => sel.addEventListener("change", atualizarVista));
 
