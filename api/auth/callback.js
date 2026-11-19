@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   const clientSecret = process.env.GITHUB_CLIENT_SECRET;
   if (!clientId || !clientSecret) return res.status(500).send("OAuth não configurado");
 
-  const redirectUri = `${req.headers["x-forwarded-proto"] || "https"}://${req.headers.host}/api/auth/callback`;
+  const redirectUri = `${req.headers["x-forwarded-proto"] || "https"}://${req.headers.host}/api/auth/callback/github`;
   const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: { "Accept": "application/json", "Content-Type": "application/json" },
