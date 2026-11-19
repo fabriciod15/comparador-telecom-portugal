@@ -28,7 +28,6 @@
       line-height: 1.5;
     }
 
-    /* Cabeçalho e Separadores */
     .navbar {
       background: var(--card);
       border-bottom: 1px solid var(--border);
@@ -59,7 +58,6 @@
       border-radius: 999px;
     }
 
-    /* Separadores (Tabs) */
     .tabs {
       display: flex;
       gap: 8px;
@@ -86,12 +84,10 @@
 
     .container { max-width: 1140px; margin: 28px auto; padding: 0 20px; }
 
-    /* Hero */
     .hero { margin-bottom: 24px; }
     .hero h1 { font-size: 1.7rem; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.02em; }
     .hero p { color: var(--muted); margin: 0; font-size: 0.95rem; }
 
-    /* Painel de Filtros */
     .painel-filtros {
       background: var(--card);
       border: 1px solid var(--border);
@@ -120,7 +116,6 @@
     }
     select:focus { outline: 2px solid var(--primary); border-color: transparent; background: #fff; }
 
-    /* Barra de Resumo */
     .resumo-bar {
       display: flex;
       justify-content: space-between;
@@ -141,7 +136,6 @@
     }
     .btn-reset:hover { background: #e2e8f0; }
 
-    /* Cartões */
     .lista-tarifarios { display: flex; flex-direction: column; gap: 14px; }
     .cartao-pacote {
       background: var(--card);
@@ -178,7 +172,6 @@
       letter-spacing: 0.04em;
     }
 
-    /* Badges Operadoras */
     .op-badge {
       display: inline-block;
       padding: 4px 10px;
@@ -236,7 +229,6 @@
         <span class="tag-transparencia">100% Independente • Custo Real a 24 Meses</span>
       </div>
 
-      <!-- Separadores do Topo -->
       <div class="tabs" role="tablist">
         <button class="tab-btn active" data-tab="CASA">🏠 Pacotes Casa (Fibra + TV)</button>
         <button class="tab-btn" data-tab="MOVEL">📱 Só Tarifários Móveis</button>
@@ -308,3 +300,7 @@
     </section>
 
     <div class="resumo-bar">
+      <div class="contador" id="contador-resultados">A carregar tarifários...</div>
+      <button class="btn-reset" id="btn-limpar">Limpar filtros</button>
+    </div>
+
