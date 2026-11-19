@@ -831,8 +831,10 @@
 
     .tariff-name .selo-vencedor {
       position: static;
-      display: table;
-      margin-bottom: 6px;
+      display: inline-block;
+      margin: 0 6px 7px 0;
+      text-transform: none;
+      vertical-align: middle;
     }
 
     .tariff-name h2 {
@@ -1325,7 +1327,7 @@
 
         row.innerHTML =
           `<td class="tariff-name">
-             ${index === 0 ? '<span class="selo-vencedor">Melhor preço real</span>' : ""}
+             ${index === 0 ? '<span class="selo-vencedor">Melhor preço</span>' : ""}
              <span class="op-badge ${classeOp}">${escaparHtml(item.operadora)}</span>
              <h2>${tituloTarifario}</h2>
              <div class="tariff-type">${escaparHtml(item.tipo)}</div>
