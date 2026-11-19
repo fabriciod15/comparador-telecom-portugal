@@ -248,6 +248,55 @@
 
         const textoVoucher = item.oferta_voucher > 0 ? '<br>Inclui oferta/voucher (-' + item.oferta_voucher + '€)' : '';
 
-        const specsHtml = item.categoria === 'MOVEL'
+                const specsHtml = item.categoria === 'MOVEL'
           ? '<span class="spec-pill">' + item.dados_gb + ' GB Dados Móveis</span>' +
             '<span class="spec-pill">Chamadas e SMS incluídos</span>' +
+            '<span class="spec-pill">Fidelização: ' +
+            (item.fidelizacao_meses === 0 ? 'Sem fidelização' : item.fidelizacao_meses + 'm') +
+            '</span>'
+          : '<span class="spec-pill">Fibra ' + item.fibra_mbps + ' Mbps</span>' +
+            '<span class="spec-pill">' +
+            (item.tv_canais > 0 ? item.tv_canais + ' Canais TV' : 'Sem TV') +
+            '</span>' +
+            '<span class="spec-pill">' + item.cartoes_moveis + ' Cartão (' + item.dados_gb + ' GB)</span>' +
+            '<span class="spec-pill">Fidelização: ' + item.fidelizacao_meses + 'm</span>';
+
+        const selo = isPrimeiro ? '<div class="selo-vencedor">Melhor Preço Real</div>' : '';
+        const tituloPreco = item.categoria === 'MOVEL' ? 'Mensalidade Real' : 'Custo Médio Real';
+
+        card.innerHTML =
+          selo +
+          '<div>' +
+            '<span class="op-badge ' + classeOp + '">' + item.operadora + '</span>' +
+            '<h2 class="pacote-titulo">' + item.nome + '</h2>' +
+            '<div class="pacote-tipo">' + item.tipo + '</div>' +
+          '</div>' +
+          '<div class="specs">' + specsHtml + '</div>' +
+          '<div class="preco-box">' +
+            '<div class="preco-label">' + tituloPreco + '</div>' +
+            '<div class="preco-real">' + item.calculo.mediaMensal.toFixed(2) + '€<span>/mês</span></div>' +
+            '<div class="preco-detalhes">' + textoPromo + textoVoucher + '</div>' +
+            '<div class="total-24m">Total a 24 meses: ' + item.calculo.total24m.toFixed(2) + '€</div>' +
+          '</div>';
+
+        container.appendChild(card);
+      });
+    }
+
+    document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', atualizarVista));
+
+    document.getElementById('btn-limpar').addEventListener('click', () => {
+      document.getElementById('filtro-operadora').value = 'TODAS';
+      document.getElementById('filtro-fibra').value = '0';
+      document.getElementById('filtro-dados').value = '0';
+      document.getElementById('filtro-fidelizacao').value = '24';
+      document.getElementById('filtro-tv').value = 'TODOS';
+      atualizarVista();
+    });
+
+    configurarTabs();
+    atualizarVista();
+  </script>
+</body>
+</html>
+
