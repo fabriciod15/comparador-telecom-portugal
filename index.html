@@ -951,14 +951,14 @@
       const fab = document.getElementById("compare-fab");
       const count = document.getElementById("compare-count");
       count.textContent = tarifariosSelecionados.size;
-      fab.classList.toggle("visible", tarifariosSelecionados.size >= 3);
-      if (tarifariosSelecionados.size < 3 && document.getElementById("compare-dialog").open) {
+      fab.classList.toggle("visible", tarifariosSelecionados.size >= 2);
+      if (tarifariosSelecionados.size < 2 && document.getElementById("compare-dialog").open) {
         document.getElementById("compare-dialog").close();
       }
     }
 
     function abrirComparacao() {
-      if (tarifariosSelecionados.size < 3) return;
+      if (tarifariosSelecionados.size < 2) return;
       const selecionados = todosTarifarios
         .filter(t => tarifariosSelecionados.has(t.nome))
         .map(t => ({ ...t, calculo: calcularCusto24Meses(t) }));
