@@ -347,7 +347,7 @@
     .op-Vodafone { background: #ffe8e9; color: #c42b32; }
     .op-NOS { background: #fff1c9; color: #946600; }
     .op-Amigo { background: #ffe7eb; color: #b51f4b; }
-    .op-Uzo { background: #e2f5df; color: #3d7435; }
+    .op-UZO { background: #e2f5df; color: #3d7435; }
     .op-default { background: #edf1f6; color: #4d5c73; }
 
     .pacote-titulo {
@@ -556,13 +556,16 @@
         <label for="filtro-operadora">Operadora</label>
         <select id="filtro-operadora">
           <option value="TODAS">Todas</option>
-          <option value="DIGI">DIGI</option>
-          <option value="WOO">WOO</option>
           <option value="Amigo">Amigo</option>
-          <option value="Uzo">Uzo</option>
+          <option value="DIGI">DIGI</option>
           <option value="MEO">MEO</option>
-          <option value="Vodafone">Vodafone</option>
+          <option value="Moche">Moche</option>
           <option value="NOS">NOS</option>
+          <option value="UZO">UZO</option>
+          <option value="Vodafone">Vodafone</option>
+          <option value="WOO">WOO</option>
+          <option value="WTF">WTF</option>
+          <option value="Yorn">Yorn</option>
         </select>
       </div>
       <div class="campo" id="campo-fibra">
@@ -686,7 +689,7 @@
       resultados.forEach((item, index) => {
         const card = document.createElement("article");
         card.className = "cartao-pacote" + (index === 0 ? " melhor-opcao" : "");
-        const conhecida = ["DIGI","WOO","MEO","Vodafone","NOS","Amigo","Uzo"].includes(item.operadora);
+        const conhecida = ["DIGI","WOO","MEO","Vodafone","NOS","Amigo","UZO","Moche","Yorn","WTF"].includes(item.operadora);
         const classeOp = conhecida ? "op-" + item.operadora : "op-default";
 
         const textoPromo = item.meses_promo > 0
