@@ -124,6 +124,7 @@
           <div class="grid">
             ${textField("Nome do tarifário","nome",item.nome)}
             ${textField("Tipo","tipo",item.tipo)}
+            ${textField("Link do tarifário","fonte",item.fonte)}
             <label>Operadora<select data-key="operadora">${operatorNames.map(name => `<option ${item.operadora===name?"selected":""}>${name}</option>`).join("")}</select></label>
             <label>Categoria<select data-key="categoria"><option ${item.categoria==="CASA"?"selected":""}>CASA</option><option ${item.categoria==="MOVEL"?"selected":""}>MOVEL</option></select></label>
             ${numberField("Fibra Mbps","fibra_mbps",item.fibra_mbps)}
@@ -233,7 +234,7 @@
     });
     document.getElementById("add").addEventListener("click", () => {
       collect();
-      tariffs.push({ categoria:"CASA",servicos:["NET"],abas:["NET"],clientes:["NOVOS","ATUAIS"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:0,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
+      tariffs.push({ categoria:"CASA",servicos:["NET"],abas:["NET"],clientes:["NOVOS","ATUAIS"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fonte:"",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:0,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
       render();
     });
     document.getElementById("cards").addEventListener("click", event => {

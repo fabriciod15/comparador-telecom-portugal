@@ -571,6 +571,18 @@
       letter-spacing: -0.3px;
     }
 
+    .pacote-titulo-link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .pacote-titulo-link:hover,
+    .pacote-titulo-link:focus-visible {
+      color: var(--blue);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
     .pacote-tipo {
       color: var(--muted);
       font-size: 12px;
@@ -891,6 +903,15 @@
       return { total24m:custoTotal, mediaMensal:custoTotal / periodo };
     }
 
+    function linkSeguroTarifario(url) {
+      try {
+        const parsed = new URL(url);
+        return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : null;
+      } catch {
+        return null;
+      }
+    }
+
     function atualizarVista() {
       const operadorasSelecionadas = [...document.querySelectorAll("#operator-menu input:checked")]
         .map(input => input.value);
@@ -953,6 +974,10 @@
           : "";
 
         const dadosTexto = item.dados_gb == null ? "Dados ilimitados" : item.dados_gb + " GB dados móveis";
+        const fonteSegura = linkSeguroTarifario(item.fonte);
+        const tituloTarifario = fonteSegura
+          ? `<a class="pacote-titulo-link" href="${fonteSegura}" target="_blank" rel="noopener noreferrer">${item.nome}</a>`
+          : item.nome;
         const specs = item.categoria === "MOVEL"
           ? `<span class="spec-pill">${dadosTexto}</span>
              <span class="spec-pill">Chamadas e SMS incluídos</span>
@@ -967,7 +992,7 @@
           (index === 0 ? '<div class="selo-vencedor">Melhor preço real</div>' : "") +
           `<div>
              <span class="op-badge ${classeOp}">${item.operadora}</span>
-             <h2 class="pacote-titulo">${item.nome}</h2>
+             <h2 class="pacote-titulo">${tituloTarifario}</h2>
              <div class="pacote-tipo">${item.tipo}</div>
            </div>
            <div class="specs">${specs}</div>
