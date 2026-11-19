@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador Telecomunicações Portugal | Preço Real Transparente</title>
-  <link rel="preconnect" href="https://googleapis.com">
-  <link rel="preconnect" href="https://gstatic.com" crossorigin>
-  <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>Simulador Telecomunicações Portugal</title>
   <style>
     :root {
       --bg: #f1f5f9;
@@ -17,169 +14,41 @@
       --primary: #2563eb;
       --green: #059669;
     }
-
     * { box-sizing: border-box; }
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
       margin: 0;
       padding: 0;
       line-height: 1.5;
     }
-
-    .navbar {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    .navbar-inner {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 14px 20px 0 20px;
-    }
-    .nav-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .brand { font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
-    .tag-transparencia {
-      background: #eff6ff;
-      color: var(--primary);
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 999px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-    }
-    .tab-btn {
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      padding: 10px 16px;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-    .tab-btn:hover { color: var(--text); }
-    .tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
+    .navbar { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+    .navbar-inner { max-width: 1140px; margin: 0 auto; padding: 14px 20px 0 20px; }
+    .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+    .brand { font-weight: 800; font-size: 1.2rem; }
+    .tag-transparencia { background: #eff6ff; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+    .tabs { display: flex; gap: 8px; overflow-x: auto; }
+    .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; padding: 10px 16px; font-size: 0.95rem; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
     .container { max-width: 1140px; margin: 28px auto; padding: 0 20px; }
-
     .hero { margin-bottom: 24px; }
-    .hero h1 { font-size: 1.7rem; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.02em; }
+    .hero h1 { font-size: 1.7rem; font-weight: 800; margin: 0 0 6px 0; }
     .hero p { color: var(--muted); margin: 0; font-size: 0.95rem; }
-
-    .painel-filtros {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-      margin-bottom: 24px;
-    }
-    .filtros-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
+    .painel-filtros { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 24px; }
+    .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
     .campo { display: flex; flex-direction: column; gap: 6px; }
     .campo.oculto { display: none; }
-    label { font-size: 0.78rem; font-weight: 600; color: #334155; text-transform: uppercase; letter-spacing: 0.03em; }
-    select {
-      padding: 10px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      background: #f8fafc;
-      color: var(--text);
-      cursor: pointer;
-    }
-    select:focus { outline: 2px solid var(--primary); border-color: transparent; background: #fff; }
-
-    .resumo-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+    label { font-size: 0.78rem; font-weight: 600; color: #334155; text-transform: uppercase; }
+    select { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #f8fafc; color: var(--text); }
+    .resumo-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
     .contador { font-size: 0.9rem; color: var(--muted); font-weight: 500; }
-    .btn-reset {
-      background: none;
-      border: 1px solid #cbd5e1;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      color: #475569;
-    }
-    .btn-reset:hover { background: #e2e8f0; }
-
+    .btn-reset { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; color: #475569; }
     .lista-tarifarios { display: flex; flex-direction: column; gap: 14px; }
-    .cartao-pacote {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 24px;
-      display: grid;
-      grid-template-columns: 2fr 2fr 1.4fr;
-      align-items: center;
-      gap: 20px;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      position: relative;
-    }
-    .cartao-pacote:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
-    }
-    .cartao-pacote.melhor-opcao {
-      border: 2px solid var(--green);
-      background: linear-gradient(to right, #f0fdf4 0%, #ffffff 25%);
-    }
-
-    .selo-vencedor {
-      position: absolute;
-      top: -11px;
-      left: 20px;
-      background: var(--green);
-      color: white;
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 2px 10px;
-      border-radius: 999px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .op-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
+    .cartao-pacote { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; display: grid; grid-template-columns: 2fr 2fr 1.4fr; align-items: center; gap: 20px; position: relative; }
+    .cartao-pacote.melhor-opcao { border: 2px solid var(--green); background: linear-gradient(to right, #f0fdf4 0%, #ffffff 25%); }
+    .selo-vencedor { position: absolute; top: -11px; left: 20px; background: var(--green); color: white; font-size: 0.72rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; text-transform: uppercase; }
+    .op-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; margin-bottom: 6px; }
     .op-DIGI { background: #dbeafe; color: #1d4ed8; }
     .op-WOO { background: #f3e8ff; color: #7e22ce; }
     .op-MEO { background: #ccfbf1; color: #0f766e; }
@@ -188,32 +57,16 @@
     .op-Amigo { background: #ffe4e6; color: #be123c; }
     .op-Uzo { background: #dcfce7; color: #15803d; }
     .op-default { background: #e2e8f0; color: #334155; }
-
     .pacote-titulo { font-size: 1.08rem; font-weight: 700; margin: 0 0 4px 0; }
     .pacote-tipo { font-size: 0.82rem; color: var(--muted); }
-
     .specs { display: flex; flex-wrap: wrap; gap: 8px; }
-    .spec-pill {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      padding: 5px 10px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: #334155;
-    }
-
-    .preco-box {
-      text-align: right;
-      border-left: 1px solid var(--border);
-      padding-left: 20px;
-    }
+    .spec-pill { background: #f8fafc; border: 1px solid var(--border); padding: 5px 10px; border-radius: 8px; font-size: 0.82rem; font-weight: 500; color: #334155; }
+    .preco-box { text-align: right; border-left: 1px solid var(--border); padding-left: 20px; }
     .preco-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 600; }
     .preco-real { font-size: 1.55rem; font-weight: 800; color: var(--green); line-height: 1.1; margin: 4px 0; }
     .preco-real span { font-size: 0.85rem; font-weight: 500; color: var(--muted); }
     .preco-detalhes { font-size: 0.78rem; color: var(--muted); }
     .total-24m { font-weight: 600; color: var(--text); margin-top: 4px; font-size: 0.82rem; }
-
     @media (max-width: 820px) {
       .cartao-pacote { grid-template-columns: 1fr; gap: 14px; }
       .preco-box { text-align: left; border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 14px; }
@@ -221,18 +74,16 @@
   </style>
 </head>
 <body>
-
   <nav class="navbar">
     <div class="navbar-inner">
       <div class="nav-top">
-        <div class="brand">📡 Comparador Telecom PT</div>
+        <div class="brand">Comparador Telecom PT</div>
         <span class="tag-transparencia">100% Independente • Custo Real a 24 Meses</span>
       </div>
-
-      <div class="tabs" role="tablist">
-        <button class="tab-btn active" data-tab="CASA">🏠 Pacotes Casa (Fibra + TV)</button>
-        <button class="tab-btn" data-tab="MOVEL">📱 Só Tarifários Móveis</button>
-        <button class="tab-btn" data-tab="TODOS">📋 Ver Todos</button>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="CASA">Pacotes Casa (Fibra + TV)</button>
+        <button class="tab-btn" data-tab="MOVEL">Só Tarifários Móveis</button>
+        <button class="tab-btn" data-tab="TODOS">Ver Todos</button>
       </div>
     </div>
   </nav>
@@ -240,7 +91,7 @@
   <div class="container">
     <header class="hero">
       <h1 id="titulo-pagina">Simulador de Pacotes Casa (Fibra, TV e Móvel)</h1>
-      <p id="subtitulo-pagina">Comparamos o preço médio real ao fim de 24 meses, diluindo promoções iniciais, instalação e vales de oferta.</p>
+      <p>Comparamos o preço médio real ao fim de 24 meses, diluindo promoções iniciais, instalação e vales de oferta.</p>
     </header>
 
     <section class="painel-filtros">
@@ -258,7 +109,6 @@
             <option value="NOS">NOS</option>
           </select>
         </div>
-
         <div class="campo" id="campo-fibra">
           <label for="filtro-fibra">Velocidade Mínima Fibra</label>
           <select id="filtro-fibra">
@@ -267,7 +117,6 @@
             <option value="1000">Mínimo 1 Gbps (1000 Mbps)</option>
           </select>
         </div>
-
         <div class="campo">
           <label for="filtro-dados">Dados Móveis Mínimos</label>
           <select id="filtro-dados">
@@ -277,7 +126,6 @@
             <option value="100">Mínimo 100 GB</option>
           </select>
         </div>
-
         <div class="campo" id="campo-tv">
           <label for="filtro-tv">Televisão</label>
           <select id="filtro-tv">
@@ -286,7 +134,6 @@
             <option value="SEM_TV">Sem TV (Só Net / Móvel)</option>
           </select>
         </div>
-
         <div class="campo">
           <label for="filtro-fidelizacao">Fidelização Máxima</label>
           <select id="filtro-fidelizacao">
@@ -304,3 +151,103 @@
       <button class="btn-reset" id="btn-limpar">Limpar filtros</button>
     </div>
 
+    <main class="lista-tarifarios" id="lista-resultados"></main>
+  </div>
+
+  <script>
+    const todosTarifarios = [
+      { categoria: "CASA", operadora: "DIGI", tipo: "Fibra + Móvel", nome: "Fibra 1 Gbps + 1 Cartão 50GB", fibra_mbps: 1000, tv_canais: 0, cartoes_moveis: 1, dados_gb: 50, fidelizacao_meses: 3, mensalidade_base: 15.00, mensalidade_promo: 15.00, meses_promo: 0, custo_instalacao: 0.00, oferta_voucher: 0.00 },
+      { categoria: "CASA", operadora: "WOO", tipo: "Fibra + Móvel", nome: "Net 1 Gbps + Móvel 100GB", fibra_mbps: 1000, tv_canais: 0, cartoes_moveis: 1, dados_gb: 100, fidelizacao_meses: 3, mensalidade_base: 25.00, mensalidade_promo: 25.00, meses_promo: 0, custo_instalacao: 0.00, oferta_voucher: 0.00 },
+      { categoria: "CASA", operadora: "MEO", tipo: "4P (TV+Net+Voz+Móvel)", nome: "M4 Fibra 500 Mbps + 1 Móvel", fibra_mbps: 500, tv_canais: 200, cartoes_moveis: 1, dados_gb: 20, fidelizacao_meses: 24, mensalidade_base: 64.99, mensalidade_promo: 44.99, meses_promo: 4, custo_instalacao: 0.00, oferta_voucher: 100.00 },
+      { categoria: "CASA", operadora: "Vodafone", tipo: "4P (TV+Net+Voz+Móvel)", nome: "Fibra 4 Play 1 Gbps + 1 Móvel", fibra_mbps: 1000, tv_canais: 170, cartoes_moveis: 1, dados_gb: 40, fidelizacao_meses: 24, mensalidade_base: 66.90, mensalidade_promo: 46.90, meses_promo: 6, custo_instalacao: 0.00, oferta_voucher: 150.00 },
+      { categoria: "MOVEL", operadora: "DIGI", tipo: "Tarifário Móvel", nome: "Móvel 50 GB + Chamadas Ilimitadas", fibra_mbps: 0, tv_canais: 0, cartoes_moveis: 1, dados_gb: 50, fidelizacao_meses: 0, mensalidade_base: 4.00, mensalidade_promo: 4.00, meses_promo: 0, custo_instalacao: 0.00, oferta_voucher: 0.00 },
+      { categoria: "MOVEL", operadora: "WOO", tipo: "Tarifário Móvel", nome: "WOO 100 GB + 5000 min/SMS", fibra_mbps: 0, tv_canais: 0, cartoes_moveis: 1, dados_gb: 100, fidelizacao_meses: 0, mensalidade_base: 8.00, mensalidade_promo: 8.00, meses_promo: 0, custo_instalacao: 0.00, oferta_voucher: 0.00 },
+      { categoria: "MOVEL", operadora: "Amigo", tipo: "Tarifário Móvel", nome: "Amigo 100 GB + Minutos Ilimitados", fibra_mbps: 0, tv_canais: 0, cartoes_moveis: 1, dados_gb: 100, fidelizacao_meses: 0, mensalidade_base: 8.00, mensalidade_promo: 8.00, meses_promo: 0, custo_instalacao: 0.00, oferta_voucher: 0.00 }
+    ];
+
+    let tabAtiva = 'CASA';
+
+    function configurarTabs() {
+      const botoes = document.querySelectorAll('.tab-btn');
+      const titulo = document.getElementById('titulo-pagina');
+      const campoFibra = document.getElementById('campo-fibra');
+      const campoTv = document.getElementById('campo-tv');
+
+      botoes.forEach(btn => {
+        btn.addEventListener('click', () => {
+          botoes.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          tabAtiva = btn.dataset.tab;
+
+          if (tabAtiva === 'MOVEL') {
+            titulo.textContent = 'Simulador de Tarifários Móveis (Cartões SIM)';
+            campoFibra.classList.add('oculto');
+            campoTv.classList.add('oculto');
+            document.getElementById('filtro-fibra').value = '0';
+            document.getElementById('filtro-tv').value = 'TODOS';
+          } else if (tabAtiva === 'CASA') {
+            titulo.textContent = 'Simulador de Pacotes Casa (Fibra, TV e Móvel)';
+            campoFibra.classList.remove('oculto');
+            campoTv.classList.remove('oculto');
+          } else {
+            titulo.textContent = 'Todos os Tarifários de Telecomunicações';
+            campoFibra.classList.remove('oculto');
+            campoTv.classList.remove('oculto');
+          }
+          atualizarVista();
+        });
+      });
+    }
+
+    function calcularCusto24Meses(t) {
+      const periodo = 24;
+      const mesesPromo = Math.min(t.meses_promo, periodo);
+      const mesesNormais = periodo - mesesPromo;
+      const custoMensalidades = (mesesPromo * t.mensalidade_promo) + (mesesNormais * t.mensalidade_base);
+      const custoTotal = custoMensalidades + t.custo_instalacao - t.oferta_voucher;
+      return { total24m: custoTotal, mediaMensal: custoTotal / periodo };
+    }
+
+    function atualizarVista() {
+      const operadora = document.getElementById('filtro-operadora').value;
+      const fibraMin = Number(document.getElementById('filtro-fibra').value);
+      const dadosMin = Number(document.getElementById('filtro-dados').value);
+      const fidMax = Number(document.getElementById('filtro-fidelizacao').value);
+      const tvFiltro = document.getElementById('filtro-tv').value;
+
+      const resultados = todosTarifarios
+        .filter(t => tabAtiva === 'TODOS' || t.categoria === tabAtiva)
+        .filter(t => operadora === 'TODAS' || t.operadora === operadora)
+        .filter(t => t.fibra_mbps >= fibraMin)
+        .filter(t => t.dados_gb >= dadosMin)
+        .filter(t => t.fidelizacao_meses <= fidMax)
+        .filter(t => tvFiltro === 'COM_TV' ? t.tv_canais > 0 : tvFiltro === 'SEM_TV' ? t.tv_canais === 0 : true)
+        .map(t => ({ ...t, calculo: calcularCusto24Meses(t) }))
+        .sort((a, b) => a.calculo.mediaMensal - b.calculo.mediaMensal);
+
+      const container = document.getElementById('lista-resultados');
+      const contador = document.getElementById('contador-resultados');
+      container.innerHTML = '';
+      contador.textContent = resultados.length + ' tarifários encontrados (ordenados pelo menor custo real)';
+
+      if (resultados.length === 0) {
+        container.innerHTML = '<div style="background:#fff;padding:30px;border-radius:12px;text-align:center;color:#64748b;">Nenhum tarifário corresponde aos filtros escolhidos.</div>';
+        return;
+      }
+
+      resultados.forEach((item, index) => {
+        const isPrimeiro = index === 0;
+        const card = document.createElement('article');
+        card.className = 'cartao-pacote ' + (isPrimeiro ? 'melhor-opcao' : '');
+        const opsConhecidas = ['DIGI', 'WOO', 'MEO', 'Vodafone', 'NOS', 'Amigo', 'Uzo'];
+        const classeOp = opsConhecidas.includes(item.operadora) ? 'op-' + item.operadora : 'op-default';
+
+        const textoPromo = item.meses_promo > 0
+          ? item.mensalidade_promo.toFixed(2) + '€ nos 1.ºs ' + item.meses_promo + ' meses, depois ' + item.mensalidade_base.toFixed(2) + '€'
+          : 'Mensalidade fixa de ' + item.mensalidade_base.toFixed(2) + '€';
+
+        const textoVoucher = item.oferta_voucher > 0 ? '<br>Inclui oferta/voucher (-' + item.oferta_voucher + '€)' : '';
+
+        const specsHtml = item.categoria === 'MOVEL'
+          ? '<span class="spec-pill">' + item.dados_gb + ' GB Dados Móveis</span>' +
+            '<span class="spec-pill">Chamadas e SMS incluídos</span>' +
