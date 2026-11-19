@@ -29,6 +29,16 @@
     .card-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
     .status { min-height:20px; margin-top:10px; color:var(--muted); font-size:13px; }
     .status.error { color:var(--danger); }
+    .admin-tabs { display:flex; gap:6px; margin-bottom:14px; border-bottom:1px solid var(--line); }
+    .admin-tab { height:42px; border:0; border-bottom:3px solid transparent; border-radius:0; background:transparent; color:var(--muted); }
+    .admin-tab.active { border-bottom-color:var(--blue); color:var(--blue); }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    .design-layout { display:grid; grid-template-columns:290px minmax(0,1fr); gap:14px; }
+    .design-controls { display:flex; flex-direction:column; gap:10px; }
+    .preview-frame { width:100%; height:720px; border:1px solid var(--line); border-radius:12px; background:#fff; }
+    .selected-element { border:1px solid var(--line); border-radius:8px; background:#fbfdff; padding:10px; color:var(--muted); font-size:12px; }
+    @media(max-width:900px){ .design-layout { grid-template-columns:1fr; } .preview-frame { height:620px; } }
     @media(max-width:800px){ .auth,.cards { grid-template-columns:1fr; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   </style>
 </head>
@@ -44,9 +54,29 @@
       <div class="status" id="status"></div>
     </section>
     <section class="panel">
-      <div class="toolbar"><strong id="count">0 tarifários</strong><button id="add">Adicionar tarifário</button></div>
-      <div class="cards" id="cards"></div>
-      <div class="toolbar" style="justify-content:flex-end;margin:16px 0 0"><button class="secondary" id="save-local">Guardar alterações locais</button><button id="save-github">Publicar no GitHub</button></div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" type="button" data-admin-tab="tariffs">Tarifários</button>
+        <button class="admin-tab" type="button" data-admin-tab="design">Design</button>
+      </div>
+      <div class="tab-content active" id="tab-tariffs">
+        <div class="toolbar"><strong id="count">0 tarifários</strong><button id="add">Adicionar tarifário</button></div>
+        <div class="cards" id="cards"></div>
+        <div class="toolbar" style="justify-content:flex-end;margin:16px 0 0"><button class="secondary" id="save-local">Guardar alterações locais</button><button id="save-github">Publicar no GitHub</button></div>
+      </div>
+      <div class="tab-content" id="tab-design">
+        <div class="design-layout">
+          <aside class="design-controls">
+            <strong>Editar visualmente</strong>
+            <div class="selected-element" id="selected-element">Clica num elemento na pré-visualização.</div>
+            <label>Texto selecionado<textarea id="selected-text" rows="4" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px"></textarea></label>
+            <label>Cor do texto<input id="selected-color" type="color" value="#14213d"></label>
+            <label>Cor de fundo<input id="selected-background" type="color" value="#ffffff"></label>
+            <button id="apply-design" type="button">Aplicar na pré-visualização</button>
+            <button class="secondary" id="reload-preview" type="button">Recarregar website</button>
+          </aside>
+          <iframe class="preview-frame" id="design-preview" title="Pré-visualização do website" src="../"></iframe>
+        </div>
+      </div>
     </section>
   </main>
   <script>
@@ -174,6 +204,61 @@
       status("Alterações guardadas neste browser.");
     });
     document.getElementById("save-github").addEventListener("click", saveToGitHub);
+    document.querySelectorAll("[data-admin-tab]").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll("[data-admin-tab]").forEach(button => button.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById("tab-" + tab.dataset.adminTab).classList.add("active");
+      });
+    });
+
+    document.getElementById("reload-preview").addEventListener("click", () => {
+      document.getElementById("design-preview").src = "../?preview=" + Date.now();
+    });
+
+    let selectedPreviewElement = null;
+    document.getElementById("apply-design").addEventListener("click", () => {
+      const frame = document.getElementById("design-preview");
+      const frameDocument = frame.contentDocument;
+      if (!frameDocument) return;
+      if (!selectedPreviewElement) {
+        status("Seleciona primeiro um elemento na pré-visualização.", true);
+        return;
+      }
+      selectedPreviewElement.textContent = document.getElementById("selected-text").value;
+      selectedPreviewElement.style.color = document.getElementById("selected-color").value;
+      selectedPreviewElement.style.backgroundColor = document.getElementById("selected-background").value;
+    });
+
+    document.getElementById("design-preview").addEventListener("load", () => {
+      const frame = document.getElementById("design-preview");
+      const frameDocument = frame.contentDocument;
+      if (!frameDocument) return;
+      frameDocument.querySelectorAll("h1,h2,p,a,button,span,.tab-btn,.brand").forEach(element => {
+        element.style.cursor = "pointer";
+        element.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          selectedPreviewElement = element;
+          document.getElementById("selected-element").textContent =
+            `${element.tagName.toLowerCase()}${element.className ? "." + String(element.className).split(" ").join(".") : ""}`;
+          document.getElementById("selected-text").value = element.textContent.trim();
+          const style = frameDocument.defaultView.getComputedStyle(element);
+          document.getElementById("selected-color").value = rgbToHex(style.color);
+          document.getElementById("selected-background").value = rgbToHex(style.backgroundColor);
+        });
+      });
+    });
+
+    function rgbToHex(color) {
+      const values = color.match(/\d+/g);
+      if (!values) return "#ffffff";
+      if (values.length < 3) return "#ffffff";
+      return "#" + values.slice(0,3).map(value =>
+        Number(value).toString(16).padStart(2,"0")
+      ).join("");
+    }
     checkSession();
   </script>
 </body>
