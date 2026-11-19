@@ -1041,6 +1041,20 @@
             document.getElementById("lista-resultados").innerHTML =
               '<div class="empty-state">Não foi possível carregar os tarifários.</div>';
           });
+
+    fetch("design.json?v=" + Date.now())
+          .then(response => response.ok ? response.json() : null)
+          .then(config => {
+            if (!config?.rules) return;
+            config.rules.forEach(rule => {
+              document.querySelectorAll(rule.selector).forEach(element => {
+                if (rule.text !== undefined) element.textContent = rule.text;
+                if (rule.color) element.style.color = rule.color;
+                if (rule.background) element.style.backgroundColor = rule.background;
+              });
+            });
+          })
+          .catch(error => console.error(error));
       });
     });
 

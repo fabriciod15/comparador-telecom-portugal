@@ -73,6 +73,7 @@
             <label>Cor de fundo<input id="selected-background" type="color" value="#ffffff"></label>
             <button id="apply-design" type="button">Aplicar na pré-visualização</button>
             <button class="secondary" id="reload-preview" type="button">Recarregar website</button>
+            <button id="publish-design" type="button">Publicar design</button>
           </aside>
           <iframe class="preview-frame" id="design-preview" title="Pré-visualização do website" src="../"></iframe>
         </div>
@@ -218,6 +219,27 @@
     });
 
     let selectedPreviewElement = null;
+    let designRules = [];
+
+    async function loadDesignConfig() {
+      try {
+        const response = await fetch("design.json?v=" + Date.now());
+        if (response.ok) {
+          const config = await response.json();
+          designRules = config.rules || [];
+        }
+      } catch {}
+    }
+
+    function previewSelector(element) {
+      if (element.id) return "#" + element.id;
+      if (element.className && typeof element.className === "string") {
+        const first = element.className.trim().split(/\s+/)[0];
+        if (first) return "." + first;
+      }
+      return element.tagName.toLowerCase();
+    }
+
     document.getElementById("apply-design").addEventListener("click", () => {
       const frame = document.getElementById("design-preview");
       const frameDocument = frame.contentDocument;
@@ -229,6 +251,29 @@
       selectedPreviewElement.textContent = document.getElementById("selected-text").value;
       selectedPreviewElement.style.color = document.getElementById("selected-color").value;
       selectedPreviewElement.style.backgroundColor = document.getElementById("selected-background").value;
+      const rule = {
+        selector: previewSelector(selectedPreviewElement),
+        text: document.getElementById("selected-text").value,
+        color: document.getElementById("selected-color").value,
+        background: document.getElementById("selected-background").value
+      };
+      designRules = designRules.filter(item => item.selector !== rule.selector);
+      designRules.push(rule);
+    });
+
+    document.getElementById("publish-design").addEventListener("click", async () => {
+      status("A publicar design...");
+      try {
+        const response = await fetch("/api/save-design", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rules: designRules })
+        });
+        if (!response.ok) throw new Error((await response.json()).error || "Não foi possível publicar");
+        status("Design publicado com sucesso.");
+      } catch (error) {
+        status(error.message, true);
+      }
     });
 
     document.getElementById("design-preview").addEventListener("load", () => {
@@ -260,6 +305,7 @@
       ).join("");
     }
     checkSession();
+    loadDesignConfig();
   </script>
 </body>
 </html>
