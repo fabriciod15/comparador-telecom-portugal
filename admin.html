@@ -47,7 +47,7 @@
   <main>
     <section class="panel">
       <div class="auth">
-        <label>Repositório<input id="repo" value="fabriciod15/comparador-telecom-portugal" readonly></label>
+        <label>Repositório<input id="repo" value="fabriciod15/comparador-telecomunicacoes-portugal" readonly></label>
         <label>Estado da sessão<input id="session-status" value="Não autenticado" readonly></label>
         <button id="login">Entrar com GitHub</button>
       </div>
@@ -216,7 +216,7 @@
 
     async function loadDesignPreview() {
       const frame = document.getElementById("design-preview");
-      const publicUrl = "https://fabriciod15.github.io/comparador-telecom-portugal/";
+      const publicUrl = "https://fabriciod15.github.io/comparador-telecomunicacoes-portugal/";
       try {
         const response = await fetch(publicUrl + "?preview=" + Date.now());
         if (!response.ok) throw new Error("Não foi possível abrir a pré-visualização");
