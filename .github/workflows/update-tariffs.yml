@@ -1,0 +1,37 @@
+name: Atualizar tarifários
+
+on:
+  schedule:
+    - cron: "15 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descarregar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Confirmar preços nas páginas oficiais
+        run: node scripts/refresh-tariffs.mjs
+
+      - name: Publicar alterações confirmadas
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tarifarios.json tariff-refresh-status.json
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração confirmada."
+            exit 0
+          fi
+          git diff --cached --stat
+          git commit -m "Atualizar tarifários confirmados"
+          git push
