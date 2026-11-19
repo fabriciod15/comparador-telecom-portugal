@@ -756,6 +756,31 @@
       text-align: right;
     }
 
+    .table-sort {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      font: inherit;
+      font-weight: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      cursor: pointer;
+    }
+
+    .table-sort:hover,
+    .table-sort:focus-visible {
+      color: var(--blue);
+    }
+
+    .table-sort .sort-arrow {
+      min-width: 10px;
+      color: var(--blue);
+    }
+
     .tariff-row {
       border-bottom: 1px solid var(--line);
       transition: background 140ms, box-shadow 140ms;
@@ -947,11 +972,11 @@
       <div class="hero-copy">
         <div class="eyebrow">Comparador independente</div>
         <h1 id="titulo-pagina">Encontra o melhor pacote para casa</h1>
-        <p id="descricao-pagina">Compara fibra, televisão e móvel pelo custo real ao longo de 24 meses.</p>
+        <p id="descricao-pagina">Compara fibra, televisão e móvel pelas características e mensalidade.</p>
       </div>
       <aside class="trust-panel" aria-label="Informação de transparência">
         <div class="trust-row"><span class="trust-icon">✓</span>Sem publicidade patrocinada</div>
-        <div class="trust-row"><span class="trust-icon">€</span>Custo real a 24 meses</div>
+        <div class="trust-row"><span class="trust-icon">€</span>Compara o custo mensal</div>
       </aside>
     </div>
   </header>
@@ -1031,15 +1056,6 @@
           <option value="0">Sem fidelização</option>
         </select>
       </div>
-      <div class="campo" id="campo-ordenacao">
-        <label for="filtro-ordenacao">Ordenar por</label>
-        <select id="filtro-ordenacao">
-          <option value="PRECO_ASC" selected>Preço ↑</option>
-          <option value="PRECO_DESC">Preço ↓</option>
-          <option value="DADOS_ASC">Dados móveis ↑</option>
-          <option value="DADOS_DESC">Dados móveis ↓</option>
-        </select>
-      </div>
     </section>
 
     <div class="results-head">
@@ -1071,7 +1087,7 @@
     </dialog>
 
     <aside class="methodology">
-      <strong>Como calculamos:</strong> custo médio mensal a 24 meses = mensalidades promocionais e normais, instalação e ofertas/vouchers.
+      <strong>Como calculamos:</strong> a mensalidade apresentada considera promoções e condições publicadas.
       Confirma sempre as condições finais no site da operadora.
     </aside>
   </main>
@@ -1087,19 +1103,8 @@
     let todosTarifarios = [];
 
     let tabAtiva = "TODOS";
+    let ordenacaoTabela = { chave: "MENSALIDADE", direcao: "ASC" };
     const tarifariosSelecionados = new Set();
-
-    function calcularCusto24Meses(t) {
-      const periodo = 24;
-      const base = Number(t.mensalidade_base ?? t.mensalidade_promo ?? 0);
-      const promo = Number(t.mensalidade_promo ?? t.mensalidade_base ?? 0);
-      const mesesPromo = t.meses_promo == null ? 0 : Math.min(Number(t.meses_promo), periodo);
-      const custoMensalidades =
-        (mesesPromo * promo) +
-        ((periodo - mesesPromo) * base);
-      const custoTotal = custoMensalidades + Number(t.custo_instalacao || 0) - Number(t.oferta_voucher || 0);
-      return { total24m:custoTotal, mediaMensal:custoTotal / periodo };
-    }
 
     function linkSeguroTarifario(url) {
       try {
@@ -1126,7 +1131,6 @@
       const fibraMin = Number(document.getElementById("filtro-fibra").value);
       const dadosFiltro = document.getElementById("filtro-dados").value;
       const dadosMin = dadosFiltro === "ILIMITADO" ? 0 : Number(dadosFiltro);
-      const ordenacao = document.getElementById("filtro-ordenacao").value;
       const fidMax = Number(document.getElementById("filtro-fidelizacao").value);
       const tvFiltro = document.getElementById("filtro-tv").value;
 
@@ -1155,15 +1159,21 @@
           : t.dados_gb == null ? dadosMin === 0 : t.dados_gb >= dadosMin)
         .filter(t => t.fidelizacao_meses == null || t.fidelizacao_meses <= fidMax)
         .filter(t => tvFiltro === "COM_TV" ? t.tv_canais > 0 : tvFiltro === "SEM_TV" ? t.tv_canais === 0 : true)
-        .map(t => ({ ...t, calculo:calcularCusto24Meses(t) }))
         .sort((a, b) => {
-          if (ordenacao === "PRECO_DESC") return b.calculo.mediaMensal - a.calculo.mediaMensal;
-          if (ordenacao === "DADOS_ASC" || ordenacao === "DADOS_DESC") {
-            const dadosA = a.dados_gb == null ? Number.POSITIVE_INFINITY : Number(a.dados_gb);
-            const dadosB = b.dados_gb == null ? Number.POSITIVE_INFINITY : Number(b.dados_gb);
-            return ordenacao === "DADOS_ASC" ? dadosA - dadosB : dadosB - dadosA;
+          let valorA;
+          let valorB;
+          if (ordenacaoTabela.chave === "FIDELIZACAO") {
+            valorA = a.fidelizacao_meses == null ? Number.POSITIVE_INFINITY : Number(a.fidelizacao_meses);
+            valorB = b.fidelizacao_meses == null ? Number.POSITIVE_INFINITY : Number(b.fidelizacao_meses);
+          } else if (ordenacaoTabela.chave === "CARACTERISTICAS") {
+            valorA = a.dados_gb == null ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
+            valorB = b.dados_gb == null ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
+          } else {
+            valorA = Number(a.mensalidade_promo ?? a.mensalidade_base ?? 0);
+            valorB = Number(b.mensalidade_promo ?? b.mensalidade_base ?? 0);
           }
-          return a.calculo.mediaMensal - b.calculo.mediaMensal;
+          const direcao = ordenacaoTabela.direcao === "ASC" ? 1 : -1;
+          return (valorA - valorB) * direcao;
         });
 
       const container = document.getElementById("lista-resultados");
@@ -1182,10 +1192,9 @@
             <thead>
               <tr>
                 <th>Tarifário</th>
-                <th>Características</th>
-                <th>Fidelização</th>
-                <th>Mensalidade</th>
-                <th>Custo 24 meses</th>
+                <th><button class="table-sort" type="button" data-sort="CARACTERISTICAS">Características <span class="sort-arrow"></span></button></th>
+                <th><button class="table-sort" type="button" data-sort="FIDELIZACAO">Fidelização <span class="sort-arrow"></span></button></th>
+                <th><button class="table-sort" type="button" data-sort="MENSALIDADE">Mensalidade <span class="sort-arrow"></span></button></th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -1193,6 +1202,20 @@
           </table>
         </div>`;
       const tbody = container.querySelector(".tariff-table tbody");
+      container.querySelectorAll("[data-sort]").forEach(button => {
+        const chave = button.dataset.sort;
+        const arrow = button.querySelector(".sort-arrow");
+        if (ordenacaoTabela.chave === chave) {
+          arrow.textContent = ordenacaoTabela.direcao === "ASC" ? "↑" : "↓";
+        }
+        button.addEventListener("click", () => {
+          ordenacaoTabela = {
+            chave,
+            direcao: ordenacaoTabela.chave === chave && ordenacaoTabela.direcao === "ASC" ? "DESC" : "ASC",
+          };
+          atualizarVista();
+        });
+      });
 
       resultados.forEach((item, index) => {
         const row = document.createElement("tr");
@@ -1204,7 +1227,7 @@
         const precoPromo = Number(item.mensalidade_promo ?? item.mensalidade_base ?? 0);
         const textoPromo = item.meses_promo > 0
           ? `${precoPromo.toFixed(2).replace(".", ",")} € nos primeiros ${item.meses_promo} meses, depois ${precoBase.toFixed(2).replace(".", ",")} €`
-          : `Mensalidade fixa de ${precoBase.toFixed(2).replace(".", ",")} €`;
+          : "";
         const textoVoucher = item.oferta_voucher > 0
           ? `<br>Oferta/voucher: −${item.oferta_voucher.toFixed(2).replace(".", ",")} €`
           : "";
@@ -1235,11 +1258,8 @@
            <td>${caracteristicas}</td>
            <td>${escaparHtml(fidelizacao)}</td>
            <td>
-             <div class="tariff-monthly">${item.calculo.mediaMensal.toFixed(2).replace(".", ",")} € <small>/mês</small></div>
+             <div class="tariff-monthly">${precoPromo.toFixed(2).replace(".", ",")} € <small>/mês</small></div>
              <div class="tariff-feature-muted">${textoPromo}${textoVoucher}</div>
-           </td>
-           <td>
-             <strong>${item.calculo.total24m.toFixed(2).replace(".", ",")} €</strong>
            </td>
            <td>
              <div class="tariff-actions">
@@ -1414,7 +1434,7 @@
       document.getElementById("filtro-dados").value = "0";
       document.getElementById("filtro-fidelizacao").value = "24";
       document.getElementById("filtro-tv").value = "TODOS";
-      document.getElementById("filtro-ordenacao").value = "PRECO_ASC";
+      ordenacaoTabela = { chave: "MENSALIDADE", direcao: "ASC" };
       carregarTarifarios();
     });
 
@@ -1459,8 +1479,7 @@
     function abrirComparacao() {
       if (tarifariosSelecionados.size < 2) return;
       const selecionados = todosTarifarios
-        .filter(t => tarifariosSelecionados.has(t.nome))
-        .map(t => ({ ...t, calculo: calcularCusto24Meses(t) }));
+        .filter(t => tarifariosSelecionados.has(t.nome));
 
       const linhas = selecionados.map(t => `
         <tr>
@@ -1468,10 +1487,10 @@
             <span class="compare-name">${t.nome}</span>
             <span class="op-badge op-${t.operadora}">${t.operadora}</span>
           </th>
-          <td>${t.calculo.mediaMensal.toFixed(2).replace(".", ",")} €/mês</td>
+          <td>${Number(t.mensalidade_promo ?? t.mensalidade_base ?? 0).toFixed(2).replace(".", ",")} €/mês</td>
           <td>
-            ${t.dados_gb > 0 ? t.dados_gb + " GB nacionais" : "—"}
-            ${t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + t.dados_roaming + "</span>" : ""}
+            ${t.dados_gb == null ? "Dados ilimitados" : t.dados_gb > 0 ? t.dados_gb + " GB nacionais" : "—"}
+            ${t.dados_gb != null && t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + t.dados_roaming + "</span>" : ""}
           </td>
           <td>${t.minutos || "—"}</td>
           <td>${t.sms || "—"}</td>
