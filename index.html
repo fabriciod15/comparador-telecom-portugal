@@ -762,13 +762,16 @@
     .tariff-table-mobile th:nth-child(3),
     .tariff-table-mobile td:nth-child(3),
     .tariff-table-mobile th:nth-child(4),
-    .tariff-table-mobile td:nth-child(4) {
+    .tariff-table-mobile td:nth-child(4),
+    .tariff-table-mobile th:nth-child(5),
+    .tariff-table-mobile td:nth-child(5) {
       text-align: center;
     }
 
     .tariff-table-mobile th:nth-child(2) .table-sort,
     .tariff-table-mobile th:nth-child(3) .table-sort,
-    .tariff-table-mobile th:nth-child(4) .table-sort {
+    .tariff-table-mobile th:nth-child(4) .table-sort,
+    .tariff-table-mobile th:nth-child(5) .table-sort {
       display: flex;
       width: 100%;
       justify-content: center;
@@ -1194,11 +1197,11 @@
         (Number(item.dados_gb) === 0 && /ilimitad/i.test(item.nome || ""));
     }
 
-    function valorChamadasSMS(item) {
-      const textos = [item.minutos, item.sms].join(" ").toLowerCase();
-      if (textos.includes("ilimit")) return Number.POSITIVE_INFINITY;
-      const numeros = [...textos.matchAll(/([0-9]+)/g)].map(match => Number(match[1]));
-      return numeros.length ? Math.max(...numeros) : 0;
+    function valorComunicacao(valor) {
+      const texto = String(valor ?? "").toLowerCase();
+      if (texto.includes("ilimit")) return Number.POSITIVE_INFINITY;
+      const quantidade = texto.match(/[0-9]+/);
+      return quantidade ? Number(quantidade[0]) : 0;
     }
 
     function textoComunicacao(valor, unidade) {
@@ -1256,9 +1259,12 @@
             } else if (regra.chave === "DADOS_ROAMING") {
               valorA = valorDadosRoaming(a.dados_roaming);
               valorB = valorDadosRoaming(b.dados_roaming);
-            } else if (regra.chave === "CHAMADAS_SMS") {
-              valorA = valorChamadasSMS(a);
-              valorB = valorChamadasSMS(b);
+            } else if (regra.chave === "CHAMADAS") {
+              valorA = valorComunicacao(a.minutos);
+              valorB = valorComunicacao(b.minutos);
+            } else if (regra.chave === "SMS") {
+              valorA = valorComunicacao(a.sms);
+              valorB = valorComunicacao(b.sms);
             } else if (regra.chave === "CARACTERISTICAS") {
               valorA = dadosIlimitados(a) ? Number.POSITIVE_INFINITY : Number(a.dados_gb || 0);
               valorB = dadosIlimitados(b) ? Number.POSITIVE_INFINITY : Number(b.dados_gb || 0);
@@ -1293,7 +1299,8 @@
                 ${tabAtiva === "MOVEL"
                   ? `<th><button class="table-sort" type="button" data-sort="DADOS_NACIONAIS">Dados móveis nacionais <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
                      <th><button class="table-sort" type="button" data-sort="DADOS_ROAMING">Dados móveis roaming <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
-                     <th><button class="table-sort" type="button" data-sort="CHAMADAS_SMS">Chamadas/SMS <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`
+                     <th><button class="table-sort" type="button" data-sort="CHAMADAS">Chamadas <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
+                     <th><button class="table-sort" type="button" data-sort="SMS">SMS <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`
                   : `<th><button class="table-sort" type="button" data-sort="CARACTERISTICAS">Características <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>`}
                 <th><button class="table-sort" type="button" data-sort="FIDELIZACAO">Fidelização <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
                 <th><button class="table-sort" type="button" data-sort="MENSALIDADE">Mensalidade <span class="sort-arrow"></span><span class="sort-priority" hidden></span></button></th>
@@ -1360,10 +1367,6 @@
           ? "Não confirmada"
           : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses";
         const dadosRoaming = escaparHtml(textoDadosRoaming(item.dados_roaming));
-        const chamadasSms = `
-          <span class="tariff-feature">${escaparHtml(textoComunicacao(item.minutos, "min"))}</span>
-          <span class="tariff-feature">${escaparHtml(textoComunicacao(item.sms, "SMS"))}</span>`;
-
         row.innerHTML =
           `<td class="tariff-name">
              <div class="tariff-badges">
@@ -1376,7 +1379,8 @@
            ${tabAtiva === "MOVEL"
              ? `<td><span class="tariff-feature">${escaparHtml(dadosTexto)}</span></td>
                 <td><span class="tariff-feature">${dadosRoaming}</span></td>
-                <td>${chamadasSms}</td>`
+                <td><span class="tariff-feature">${escaparHtml(textoComunicacao(item.minutos, "min"))}</span></td>
+                <td><span class="tariff-feature">${escaparHtml(textoComunicacao(item.sms, "SMS"))}</span></td>`
              : `<td>${caracteristicas}</td>`}
            <td>${escaparHtml(fidelizacao)}</td>
            <td>
