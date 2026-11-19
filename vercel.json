@@ -3,6 +3,7 @@
     { "source": "/api/auth/callback/github", "destination": "/api/auth/callback" },
     { "source": "/api/auth/callback", "destination": "/api/auth/callback" },
     { "source": "/api/auth/login", "destination": "/api/auth/login" },
+    { "source": "/api/logout", "destination": "/api/logout" },
     { "source": "/api/me", "destination": "/api/me" },
     { "source": "/api/save", "destination": "/api/save" }
   ]

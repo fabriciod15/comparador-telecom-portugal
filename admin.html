@@ -144,7 +144,7 @@
       if (response.ok) {
         const data = await response.json();
         document.getElementById("session-status").value = `Autenticado como ${data.login}`;
-        document.getElementById("login").textContent = "Atualizar sessão";
+        document.getElementById("login").textContent = "Terminar sessão";
         await loadFromGitHub();
       } else {
         document.getElementById("session-status").value = "Não autenticado";
@@ -153,7 +153,9 @@
     }
 
     document.getElementById("login").addEventListener("click", () => {
-      location.href = "/api/auth/login";
+      fetch("/api/me").then(response => {
+        location.href = response.ok ? "/api/logout" : "/api/auth/login";
+      });
     });
     document.getElementById("add").addEventListener("click", () => {
       collect();
