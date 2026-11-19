@@ -787,6 +787,19 @@
           </div>
         </div>
       </div>
+      <div class="campo">
+        <label>Tipo de cliente</label>
+        <div class="operator-picker" id="customer-picker">
+          <button class="operator-trigger" id="customer-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+            Todos
+          </button>
+          <div class="operator-menu" id="customer-menu">
+            <label class="operator-option"><input type="checkbox" value="TODOS" checked> Todos os clientes</label>
+            <label class="operator-option"><input type="checkbox" value="NOVOS"> Novos clientes</label>
+            <label class="operator-option"><input type="checkbox" value="ATUAIS"> Clientes atuais</label>
+          </div>
+        </div>
+      </div>
       <div class="campo" id="campo-fibra">
         <label for="filtro-fibra">Velocidade mínima</label>
         <select id="filtro-fibra">
@@ -882,6 +895,9 @@
       const operadorasSelecionadas = [...document.querySelectorAll("#operator-menu input:checked")]
         .map(input => input.value);
       const todasSelecionadas = operadorasSelecionadas.includes("TODAS") || operadorasSelecionadas.length === 0;
+      const tiposClienteSelecionados = [...document.querySelectorAll("#customer-menu input:checked")]
+        .map(input => input.value);
+      const todosOsClientes = tiposClienteSelecionados.includes("TODOS") || tiposClienteSelecionados.length === 0;
       const fibraMin = Number(document.getElementById("filtro-fibra").value);
       const dadosMin = Number(document.getElementById("filtro-dados").value);
       const fidMax = Number(document.getElementById("filtro-fidelizacao").value);
@@ -898,6 +914,11 @@
           return true;
         })
         .filter(t => todasSelecionadas || operadorasSelecionadas.includes(t.operadora))
+        .filter(t => {
+          if (todosOsClientes) return true;
+          if (!Array.isArray(t.clientes) || t.clientes.length === 0) return true;
+          return tiposClienteSelecionados.some(tipo => t.clientes.includes(tipo));
+        })
         .filter(t => t.fibra_mbps >= fibraMin)
         .filter(t => t.dados_gb == null ? dadosMin === 0 : t.dados_gb >= dadosMin)
         .filter(t => t.fidelizacao_meses == null || t.fidelizacao_meses <= fidMax)
@@ -1079,10 +1100,45 @@
       });
     });
 
+    const customerPicker = document.getElementById("customer-picker");
+    const customerTrigger = document.getElementById("customer-trigger");
+
+    customerTrigger.addEventListener("click", () => {
+      const open = customerPicker.classList.toggle("open");
+      customerTrigger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    document.querySelectorAll("#customer-menu input").forEach(input => {
+      input.addEventListener("change", () => {
+        const allInput = document.querySelector('#customer-menu input[value="TODOS"]');
+        const customerInputs = [...document.querySelectorAll('#customer-menu input:not([value="TODOS"])')];
+
+        if (input.value === "TODOS" && input.checked) {
+          customerInputs.forEach(option => { option.checked = false; });
+        } else if (input.checked) {
+          allInput.checked = false;
+        } else if (!customerInputs.some(option => option.checked)) {
+          allInput.checked = true;
+        }
+
+        const selecionados = customerInputs.filter(option => option.checked).map(option => option.value);
+        customerTrigger.textContent = allInput.checked || selecionados.length === 0
+          ? "Todos"
+          : selecionados.length === 1
+            ? (selecionados[0] === "NOVOS" ? "Novos clientes" : "Clientes atuais")
+            : "Novos + atuais";
+        atualizarVista();
+      });
+    });
+
     document.addEventListener("click", evento => {
       if (!operatorPicker.contains(evento.target)) {
         operatorPicker.classList.remove("open");
         operatorTrigger.setAttribute("aria-expanded", "false");
+      }
+      if (!customerPicker.contains(evento.target)) {
+        customerPicker.classList.remove("open");
+        customerTrigger.setAttribute("aria-expanded", "false");
       }
     });
 
@@ -1090,7 +1146,11 @@
       document.querySelectorAll("#operator-menu input").forEach(input => {
         input.checked = input.value === "TODAS";
       });
+      document.querySelectorAll("#customer-menu input").forEach(input => {
+        input.checked = input.value === "TODOS";
+      });
       document.getElementById("operator-trigger").textContent = "Todas";
+      document.getElementById("customer-trigger").textContent = "Todos";
       document.getElementById("filtro-fibra").value = "0";
       document.getElementById("filtro-dados").value = "0";
       document.getElementById("filtro-fidelizacao").value = "24";

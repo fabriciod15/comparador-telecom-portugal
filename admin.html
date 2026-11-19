@@ -26,6 +26,9 @@
     .services { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px; }
     .services label { flex-direction:row; align-items:center; }
     .services input { width:16px; height:16px; }
+    .customer-options { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px; }
+    .customer-options label { flex-direction:row; align-items:center; }
+    .customer-options input { width:16px; height:16px; }
     .card-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
     .status { min-height:20px; margin-top:10px; color:var(--muted); font-size:13px; }
     .status.error { color:var(--danger); }
@@ -123,6 +126,7 @@
             ${numberField("Instalação","custo_instalacao",item.custo_instalacao)}
             ${numberField("Oferta/voucher","oferta_voucher",item.oferta_voucher)}
             <div class="services"><strong>Serviços</strong>${["NET","TV","VOZ","MOVEL"].map(service => `<label><input type="checkbox" data-service="${service}" ${item.servicos?.includes(service)?"checked":""}> ${service}</label>`).join("")}</div>
+            <div class="customer-options"><strong>Tipo de cliente</strong>${["NOVOS","ATUAIS"].map(tipo => `<label><input type="checkbox" data-cliente="${tipo}" ${(!item.clientes || item.clientes.includes(tipo))?"checked":""}> ${tipo==="NOVOS"?"Novos clientes":"Clientes atuais"}</label>`).join("")}</div>
           </div>
           <div class="card-actions"><button class="danger" data-delete="${index}">Eliminar</button></div>
         </article>
@@ -138,6 +142,7 @@
           tariffs[index][field.dataset.key] = numberFields.includes(field.dataset.key) ? Number(value) : value;
         });
         tariffs[index].servicos = [...card.querySelectorAll("[data-service]:checked")].map(field => field.dataset.service);
+        tariffs[index].clientes = [...card.querySelectorAll("[data-cliente]:checked")].map(field => field.dataset.cliente);
       });
     }
 
@@ -191,7 +196,7 @@
     });
     document.getElementById("add").addEventListener("click", () => {
       collect();
-      tariffs.push({ categoria:"CASA",servicos:["NET"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:0,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
+      tariffs.push({ categoria:"CASA",servicos:["NET"],clientes:["NOVOS","ATUAIS"],operadora:"DIGI",tipo:"",nome:"Novo tarifário",fibra_mbps:0,tv_canais:0,cartoes_moveis:0,dados_gb:0,dados_roaming:"—",minutos:"—",sms:"—",fidelizacao_meses:0,mensalidade_base:0,mensalidade_promo:0,meses_promo:0,custo_instalacao:0,oferta_voucher:0 });
       render();
     });
     document.getElementById("cards").addEventListener("click", event => {
