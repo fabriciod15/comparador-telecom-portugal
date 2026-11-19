@@ -262,6 +262,74 @@
       box-shadow: 0 0 0 3px rgba(36, 107, 254, 0.10);
     }
 
+    .operator-picker {
+      position: relative;
+    }
+
+    .operator-trigger {
+      width: 100%;
+      height: 43px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fbfdff;
+      color: var(--ink);
+      padding: 0 11px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .operator-trigger::after {
+      content: "⌄";
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .operator-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      z-index: 30;
+      width: 220px;
+      display: none;
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 6px;
+      box-shadow: 0 14px 36px rgba(20, 33, 61, 0.16);
+    }
+
+    .operator-picker.open .operator-menu { display: block; }
+
+    .operator-option {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border-radius: 7px;
+      padding: 7px 8px;
+      color: var(--ink-2);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .operator-option:hover {
+      background: #f4f7fb;
+    }
+
+    .operator-option input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--blue);
+    }
+
     .results-head {
       display: flex;
       align-items: center;
@@ -696,20 +764,25 @@
   <main class="container main">
     <section class="filters" aria-label="Filtros">
       <div class="campo">
-        <label for="filtro-operadora">Operadora</label>
-        <select id="filtro-operadora">
-          <option value="TODAS">Todas</option>
-          <option value="Amigo">Amigo</option>
-          <option value="DIGI">DIGI</option>
-          <option value="MEO">MEO</option>
-          <option value="Moche">Moche</option>
-          <option value="NOS">NOS</option>
-          <option value="UZO">UZO</option>
-          <option value="Vodafone">Vodafone</option>
-          <option value="WOO">WOO</option>
-          <option value="WTF">WTF</option>
-          <option value="Yorn">Yorn</option>
-        </select>
+        <label>Operadora</label>
+        <div class="operator-picker" id="operator-picker">
+          <button class="operator-trigger" id="operator-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+            Todas
+          </button>
+          <div class="operator-menu" id="operator-menu">
+            <label class="operator-option"><input type="checkbox" value="TODAS" checked> Todas</label>
+            <label class="operator-option"><input type="checkbox" value="Amigo"> Amigo</label>
+            <label class="operator-option"><input type="checkbox" value="DIGI"> DIGI</label>
+            <label class="operator-option"><input type="checkbox" value="MEO"> MEO</label>
+            <label class="operator-option"><input type="checkbox" value="Moche"> Moche</label>
+            <label class="operator-option"><input type="checkbox" value="NOS"> NOS</label>
+            <label class="operator-option"><input type="checkbox" value="UZO"> UZO</label>
+            <label class="operator-option"><input type="checkbox" value="Vodafone"> Vodafone</label>
+            <label class="operator-option"><input type="checkbox" value="WOO"> WOO</label>
+            <label class="operator-option"><input type="checkbox" value="WTF"> WTF</label>
+            <label class="operator-option"><input type="checkbox" value="Yorn"> Yorn</label>
+          </div>
+        </div>
       </div>
       <div class="campo" id="campo-fibra">
         <label for="filtro-fibra">Velocidade mínima</label>
@@ -813,7 +886,9 @@
     }
 
     function atualizarVista() {
-      const operadora = document.getElementById("filtro-operadora").value;
+      const operadorasSelecionadas = [...document.querySelectorAll("#operator-menu input:checked")]
+        .map(input => input.value);
+      const todasSelecionadas = operadorasSelecionadas.includes("TODAS") || operadorasSelecionadas.length === 0;
       const fibraMin = Number(document.getElementById("filtro-fibra").value);
       const dadosMin = Number(document.getElementById("filtro-dados").value);
       const fidMax = Number(document.getElementById("filtro-fidelizacao").value);
@@ -829,7 +904,7 @@
           if (tabAtiva === "TV_NET_VOZ_MOVEL") return t.servicos.includes("TV") && t.servicos.includes("NET") && t.servicos.includes("VOZ") && t.servicos.includes("MOVEL");
           return true;
         })
-        .filter(t => operadora === "TODAS" || t.operadora === operadora)
+        .filter(t => todasSelecionadas || operadorasSelecionadas.includes(t.operadora))
         .filter(t => t.fibra_mbps >= fibraMin)
         .filter(t => t.dados_gb >= dadosMin)
         .filter(t => t.fidelizacao_meses <= fidMax)
@@ -938,8 +1013,49 @@
 
     document.querySelectorAll("select").forEach(sel => sel.addEventListener("change", atualizarVista));
 
+    const operatorPicker = document.getElementById("operator-picker");
+    const operatorTrigger = document.getElementById("operator-trigger");
+
+    operatorTrigger.addEventListener("click", () => {
+      const open = operatorPicker.classList.toggle("open");
+      operatorTrigger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    document.querySelectorAll("#operator-menu input").forEach(input => {
+      input.addEventListener("change", () => {
+        const allInput = document.querySelector('#operator-menu input[value="TODAS"]');
+        const operatorInputs = [...document.querySelectorAll('#operator-menu input:not([value="TODAS"])')];
+
+        if (input.value === "TODAS" && input.checked) {
+          operatorInputs.forEach(option => { option.checked = false; });
+        } else if (input.checked) {
+          allInput.checked = false;
+        } else if (!operatorInputs.some(option => option.checked)) {
+          allInput.checked = true;
+        }
+
+        const selecionadas = operatorInputs.filter(option => option.checked).map(option => option.value);
+        operatorTrigger.textContent = allInput.checked || selecionadas.length === 0
+          ? "Todas"
+          : selecionadas.length === 1
+            ? selecionadas[0]
+            : `${selecionadas.length} operadoras`;
+        atualizarVista();
+      });
+    });
+
+    document.addEventListener("click", evento => {
+      if (!operatorPicker.contains(evento.target)) {
+        operatorPicker.classList.remove("open");
+        operatorTrigger.setAttribute("aria-expanded", "false");
+      }
+    });
+
     document.getElementById("btn-limpar").addEventListener("click", () => {
-      document.getElementById("filtro-operadora").value = "TODAS";
+      document.querySelectorAll("#operator-menu input").forEach(input => {
+        input.checked = input.value === "TODAS";
+      });
+      document.getElementById("operator-trigger").textContent = "Todas";
       document.getElementById("filtro-fibra").value = "0";
       document.getElementById("filtro-dados").value = "0";
       document.getElementById("filtro-fidelizacao").value = "24";
