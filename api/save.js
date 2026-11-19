@@ -30,9 +30,9 @@ export default async function handler(req, res) {
   if (!allowed.includes(session.login)) return res.status(403).json({ error: "Conta não autorizada" });
 
   if (!Array.isArray(req.body)) return res.status(400).json({ error: "Formato inválido" });
-  const owner = process.env.GITHUB_OWNER || "fabriciod15";
-  const repo = process.env.GITHUB_REPO || "comparador-telecomunicacoes-portugal";
-  const token = session.accessToken || process.env.GITHUB_TOKEN;
+  const owner = "fabriciod15";
+  const repo = "comparador-telecomunicacoes-portugal";
+  const token = process.env.GITHUB_TOKEN || session.accessToken;
   if (!owner || !repo || !token) return res.status(500).json({ error: "GitHub não configurado. Inicie sessão novamente." });
 
   const fileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/tarifarios.json`;
@@ -46,7 +46,13 @@ export default async function handler(req, res) {
     body: JSON.stringify(body)
   });
   if (!saveResponse.ok) {
-    const detail = await saveResponse.json();
+    const detail = await saveResponse.json().catch(() => ({}));
+    if (saveResponse.status === 404) {
+      return res.status(404).json({ error: "GitHub não encontrou o repositório ou não concedeu acesso de escrita. Termine a sessão e entre novamente." });
+    }
+    if (saveResponse.status === 401 || saveResponse.status === 403) {
+      return res.status(saveResponse.status).json({ error: "O GitHub não concedeu permissão de escrita ao repositório. Termine a sessão e autorize novamente." });
+    }
     return res.status(saveResponse.status).json({ error: detail.message || "Falha ao publicar" });
   }
   return res.status(200).json({ ok: true });

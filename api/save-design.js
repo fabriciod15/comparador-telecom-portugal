@@ -24,9 +24,9 @@ export default async function handler(req, res) {
   if (!allowed.includes(session.login)) return res.status(403).json({ error: "Conta não autorizada" });
   if (!req.body || typeof req.body !== "object") return res.status(400).json({ error: "Formato inválido" });
 
-  const owner = process.env.GITHUB_OWNER || "fabriciod15";
-  const repo = process.env.GITHUB_REPO || "comparador-telecomunicacoes-portugal";
-  const token = session.accessToken || process.env.GITHUB_TOKEN;
+  const owner = "fabriciod15";
+  const repo = "comparador-telecomunicacoes-portugal";
+  const token = process.env.GITHUB_TOKEN || session.accessToken;
   if (!owner || !repo || !token) return res.status(500).json({ error: "GitHub não configurado. Inicie sessão novamente." });
 
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/design.json`;
