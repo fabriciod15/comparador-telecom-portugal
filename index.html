@@ -453,6 +453,13 @@
       font-size: 14px;
     }
 
+    .compare-roaming {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
     .selo-vencedor {
       position: absolute;
       top: -10px;
@@ -779,17 +786,17 @@
 
   <script>
     const todosTarifarios = [
-      { categoria:"CASA", servicos:["NET","MOVEL"], operadora:"DIGI", tipo:"Fibra + móvel", nome:"Fibra 1 Gbps + 1 cartão 50 GB", fibra_mbps:1000, tv_canais:0, cartoes_moveis:1, dados_gb:50, fidelizacao_meses:3, mensalidade_base:15, mensalidade_promo:15, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
-      { categoria:"CASA", servicos:["NET","MOVEL"], operadora:"WOO", tipo:"Fibra + móvel", nome:"Net 1 Gbps + móvel 100 GB", fibra_mbps:1000, tv_canais:0, cartoes_moveis:1, dados_gb:100, fidelizacao_meses:3, mensalidade_base:25, mensalidade_promo:25, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
-      { categoria:"CASA", servicos:["TV","NET","VOZ","MOVEL"], operadora:"MEO", tipo:"4P — TV, net, voz e móvel", nome:"M4 Fibra 500 Mbps + 1 móvel", fibra_mbps:500, tv_canais:200, cartoes_moveis:1, dados_gb:20, fidelizacao_meses:24, mensalidade_base:64.99, mensalidade_promo:44.99, meses_promo:4, custo_instalacao:0, oferta_voucher:100 },
-      { categoria:"CASA", servicos:["TV","NET","VOZ","MOVEL"], operadora:"Vodafone", tipo:"4P — TV, net, voz e móvel", nome:"Fibra 4 Play 1 Gbps + 1 móvel", fibra_mbps:1000, tv_canais:170, cartoes_moveis:1, dados_gb:40, fidelizacao_meses:24, mensalidade_base:66.90, mensalidade_promo:46.90, meses_promo:6, custo_instalacao:0, oferta_voucher:150 },
-      { categoria:"CASA", servicos:["TV","NET","VOZ"], operadora:"MEO", tipo:"3P — TV, net e voz", nome:"M3 Fibra 500 Mbps", fibra_mbps:500, tv_canais:200, cartoes_moveis:0, dados_gb:0, fidelizacao_meses:24, mensalidade_base:54.99, mensalidade_promo:39.99, meses_promo:4, custo_instalacao:0, oferta_voucher:80 },
-      { categoria:"CASA", servicos:["TV","NET","VOZ"], operadora:"NOS", tipo:"3P — TV, net e voz", nome:"Pack Fibra 500 Mbps + TV", fibra_mbps:500, tv_canais:180, cartoes_moveis:0, dados_gb:0, fidelizacao_meses:24, mensalidade_base:52.99, mensalidade_promo:37.99, meses_promo:6, custo_instalacao:0, oferta_voucher:100 },
-      { categoria:"CASA", servicos:["NET"], operadora:"DIGI", tipo:"Net apenas", nome:"Fibra 1 Gbps", fibra_mbps:1000, tv_canais:0, cartoes_moveis:0, dados_gb:0, fidelizacao_meses:3, mensalidade_base:12, mensalidade_promo:12, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
-      { categoria:"CASA", servicos:["NET"], operadora:"WOO", tipo:"Net apenas", nome:"Net Fibra 1 Gbps", fibra_mbps:1000, tv_canais:0, cartoes_moveis:0, dados_gb:0, fidelizacao_meses:3, mensalidade_base:20, mensalidade_promo:20, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
-      { categoria:"MOVEL", servicos:["MOVEL"], operadora:"DIGI", tipo:"Tarifário móvel", nome:"Móvel 50 GB + chamadas ilimitadas", fibra_mbps:0, tv_canais:0, cartoes_moveis:1, dados_gb:50, fidelizacao_meses:0, mensalidade_base:4, mensalidade_promo:4, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
-      { categoria:"MOVEL", servicos:["MOVEL"], operadora:"WOO", tipo:"Tarifário móvel", nome:"WOO 100 GB + 5000 min/SMS", fibra_mbps:0, tv_canais:0, cartoes_moveis:1, dados_gb:100, fidelizacao_meses:0, mensalidade_base:8, mensalidade_promo:8, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
-      { categoria:"MOVEL", servicos:["MOVEL"], operadora:"Amigo", tipo:"Tarifário móvel", nome:"Amigo 100 GB + minutos ilimitados", fibra_mbps:0, tv_canais:0, cartoes_moveis:1, dados_gb:100, fidelizacao_meses:0, mensalidade_base:8, mensalidade_promo:8, meses_promo:0, custo_instalacao:0, oferta_voucher:0 }
+      { categoria:"CASA", servicos:["NET","MOVEL"], operadora:"DIGI", tipo:"Fibra + móvel", nome:"Fibra 1 Gbps + 1 cartão 50 GB", fibra_mbps:1000, tv_canais:0, cartoes_moveis:1, dados_gb:50, dados_roaming:"20 GB", minutos:"Ilimitados", sms:"Ilimitados", fidelizacao_meses:3, mensalidade_base:15, mensalidade_promo:15, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
+      { categoria:"CASA", servicos:["NET","MOVEL"], operadora:"WOO", tipo:"Fibra + móvel", nome:"Net 1 Gbps + móvel 100 GB", fibra_mbps:1000, tv_canais:0, cartoes_moveis:1, dados_gb:100, dados_roaming:"30 GB", minutos:"Ilimitados", sms:"Ilimitados", fidelizacao_meses:3, mensalidade_base:25, mensalidade_promo:25, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
+      { categoria:"CASA", servicos:["TV","NET","VOZ","MOVEL"], operadora:"MEO", tipo:"4P — TV, net, voz e móvel", nome:"M4 Fibra 500 Mbps + 1 móvel", fibra_mbps:500, tv_canais:200, cartoes_moveis:1, dados_gb:20, dados_roaming:"4 GB", minutos:"Ilimitados", sms:"Ilimitados", fidelizacao_meses:24, mensalidade_base:64.99, mensalidade_promo:44.99, meses_promo:4, custo_instalacao:0, oferta_voucher:100 },
+      { categoria:"CASA", servicos:["TV","NET","VOZ","MOVEL"], operadora:"Vodafone", tipo:"4P — TV, net, voz e móvel", nome:"Fibra 4 Play 1 Gbps + 1 móvel", fibra_mbps:1000, tv_canais:170, cartoes_moveis:1, dados_gb:40, dados_roaming:"10 GB", minutos:"Ilimitados", sms:"Ilimitados", fidelizacao_meses:24, mensalidade_base:66.90, mensalidade_promo:46.90, meses_promo:6, custo_instalacao:0, oferta_voucher:150 },
+      { categoria:"CASA", servicos:["TV","NET","VOZ"], operadora:"MEO", tipo:"3P — TV, net e voz", nome:"M3 Fibra 500 Mbps", fibra_mbps:500, tv_canais:200, cartoes_moveis:0, dados_gb:0, dados_roaming:"—", minutos:"—", sms:"—", fidelizacao_meses:24, mensalidade_base:54.99, mensalidade_promo:39.99, meses_promo:4, custo_instalacao:0, oferta_voucher:80 },
+      { categoria:"CASA", servicos:["TV","NET","VOZ"], operadora:"NOS", tipo:"3P — TV, net e voz", nome:"Pack Fibra 500 Mbps + TV", fibra_mbps:500, tv_canais:180, cartoes_moveis:0, dados_gb:0, dados_roaming:"—", minutos:"—", sms:"—", fidelizacao_meses:24, mensalidade_base:52.99, mensalidade_promo:37.99, meses_promo:6, custo_instalacao:0, oferta_voucher:100 },
+      { categoria:"CASA", servicos:["NET"], operadora:"DIGI", tipo:"Net apenas", nome:"Fibra 1 Gbps", fibra_mbps:1000, tv_canais:0, cartoes_moveis:0, dados_gb:0, dados_roaming:"—", minutos:"—", sms:"—", fidelizacao_meses:3, mensalidade_base:12, mensalidade_promo:12, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
+      { categoria:"CASA", servicos:["NET"], operadora:"WOO", tipo:"Net apenas", nome:"Net Fibra 1 Gbps", fibra_mbps:1000, tv_canais:0, cartoes_moveis:0, dados_gb:0, dados_roaming:"—", minutos:"—", sms:"—", fidelizacao_meses:3, mensalidade_base:20, mensalidade_promo:20, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
+      { categoria:"MOVEL", servicos:["MOVEL"], operadora:"DIGI", tipo:"Tarifário móvel", nome:"Móvel 50 GB + chamadas ilimitadas", fibra_mbps:0, tv_canais:0, cartoes_moveis:1, dados_gb:50, dados_roaming:"20 GB", minutos:"Ilimitados", sms:"Ilimitados", fidelizacao_meses:0, mensalidade_base:4, mensalidade_promo:4, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
+      { categoria:"MOVEL", servicos:["MOVEL"], operadora:"WOO", tipo:"Tarifário móvel", nome:"WOO 100 GB + 5000 min/SMS", fibra_mbps:0, tv_canais:0, cartoes_moveis:1, dados_gb:100, dados_roaming:"30 GB", minutos:"5000", sms:"5000", fidelizacao_meses:0, mensalidade_base:8, mensalidade_promo:8, meses_promo:0, custo_instalacao:0, oferta_voucher:0 },
+      { categoria:"MOVEL", servicos:["MOVEL"], operadora:"Amigo", tipo:"Tarifário móvel", nome:"Amigo 100 GB + minutos ilimitados", fibra_mbps:0, tv_canais:0, cartoes_moveis:1, dados_gb:100, dados_roaming:"20 GB", minutos:"Ilimitados", sms:"Ilimitados", fidelizacao_meses:0, mensalidade_base:8, mensalidade_promo:8, meses_promo:0, custo_instalacao:0, oferta_voucher:0 }
     ];
 
     let tabAtiva = "TODOS";
@@ -956,26 +963,37 @@
         .filter(t => tarifariosSelecionados.has(t.nome))
         .map(t => ({ ...t, calculo: calcularCusto24Meses(t) }));
 
-      const linhas = [
-        ["Operadora", t => t.operadora],
-        ["Tipo", t => t.tipo],
-        ["Fibra", t => t.fibra_mbps > 0 ? (t.fibra_mbps >= 1000 ? t.fibra_mbps / 1000 + " Gbps" : t.fibra_mbps + " Mbps") : "—"],
-        ["Televisão", t => t.tv_canais > 0 ? t.tv_canais + " canais" : "Sem TV"],
-        ["Dados móveis", t => t.dados_gb > 0 ? t.dados_gb + " GB" : "—"],
-        ["Fidelização", t => t.fidelizacao_meses === 0 ? "Sem fidelização" : t.fidelizacao_meses + " meses"],
-        ["Custo médio/mês", t => t.calculo.mediaMensal.toFixed(2).replace(".", ",") + " €"],
-        ["Total a 24 meses", t => t.calculo.total24m.toFixed(2).replace(".", ",") + " €"]
-      ];
-
-      const cabecalho = selecionados.map(t =>
-        `<th scope="col"><span class="compare-name">${t.nome}</span><span class="op-badge op-${t.operadora}">${t.operadora}</span></th>`
-      ).join("");
-      const corpo = linhas.map(([rotulo, obter]) =>
-        `<tr><th scope="row">${rotulo}</th>${selecionados.map(t => `<td>${obter(t)}</td>`).join("")}</tr>`
-      ).join("");
+      const linhas = selecionados.map(t => `
+        <tr>
+          <th scope="row">
+            <span class="compare-name">${t.nome}</span>
+            <span class="op-badge op-${t.operadora}">${t.operadora}</span>
+          </th>
+          <td>${t.calculo.mediaMensal.toFixed(2).replace(".", ",")} €/mês</td>
+          <td>
+            ${t.dados_gb > 0 ? t.dados_gb + " GB nacionais" : "—"}
+            ${t.dados_gb > 0 ? '<span class="compare-roaming">Roaming UE: ' + t.dados_roaming + "</span>" : ""}
+          </td>
+          <td>${t.minutos || "—"}</td>
+          <td>${t.sms || "—"}</td>
+          <td>${t.fidelizacao_meses === 0 ? "Sem fidelização" : t.fidelizacao_meses + " meses"}</td>
+        </tr>
+      `).join("");
 
       document.getElementById("compare-table-wrap").innerHTML =
-        `<table class="compare-table"><thead><tr><th scope="col">Tarifário</th>${cabecalho}</tr></thead><tbody>${corpo}</tbody></table>`;
+        `<table class="compare-table">
+          <thead>
+            <tr>
+              <th scope="col">Nome do tarifário</th>
+              <th scope="col">Preço por mês</th>
+              <th scope="col">Dados móveis</th>
+              <th scope="col">Minutos</th>
+              <th scope="col">SMS</th>
+              <th scope="col">Fidelização</th>
+            </tr>
+          </thead>
+          <tbody>${linhas}</tbody>
+        </table>`;
       document.getElementById("compare-dialog").showModal();
     }
 
