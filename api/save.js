@@ -27,8 +27,8 @@ export default async function handler(req, res) {
   if (!allowed.includes(session.login)) return res.status(403).json({ error: "Conta não autorizada" });
 
   if (!Array.isArray(req.body)) return res.status(400).json({ error: "Formato inválido" });
-  const owner = process.env.GITHUB_OWNER;
-  const repo = process.env.GITHUB_REPO;
+  const owner = process.env.GITHUB_OWNER || "fabriciod15";
+  const repo = process.env.GITHUB_REPO || "comparador-telecomunicacoes-portugal";
   const token = process.env.GITHUB_TOKEN;
   if (!owner || !repo || !token) return res.status(500).json({ error: "GitHub não configurado" });
 
