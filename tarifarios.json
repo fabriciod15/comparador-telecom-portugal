@@ -27,7 +27,9 @@
     ],
     "abas": [
       "NET"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "CASA",
@@ -57,7 +59,9 @@
     ],
     "abas": [
       "NET"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "CASA",
@@ -87,7 +91,9 @@
     ],
     "abas": [
       "NET"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "MOVEL",
@@ -105,8 +111,8 @@
     "minutos": "Ilimitados nacionais",
     "sms": "",
     "fidelizacao_meses": 0,
-    "mensalidade_base": 5,
-    "mensalidade_promo": 5,
+    "mensalidade_base": 4,
+    "mensalidade_promo": 4,
     "meses_promo": 0,
     "custo_instalacao": 0,
     "oferta_voucher": 0,
@@ -117,7 +123,9 @@
     ],
     "abas": [
       "MOVEL"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "MOVEL",
@@ -147,7 +155,9 @@
     ],
     "abas": [
       "MOVEL"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "MOVEL",
@@ -177,7 +187,9 @@
     ],
     "abas": [
       "MOVEL"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "MOVEL",
@@ -196,7 +208,7 @@
     "sms": "1000 SMS para números DIGI",
     "fidelizacao_meses": 0,
     "mensalidade_base": 6,
-    "mensalidade_promo": 5,
+    "mensalidade_promo": 6,
     "meses_promo": 0,
     "custo_instalacao": 0,
     "oferta_voucher": 0,
@@ -207,7 +219,9 @@
     ],
     "abas": [
       "MOVEL"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "MOVEL",
@@ -236,7 +250,9 @@
     ],
     "abas": [
       "MOVEL"
-    ]
+    ],
+    "data_limite_adesao": "2026-11-30",
+    "ativo": true
   },
   {
     "categoria": "CASA",
@@ -267,7 +283,9 @@
     ],
     "abas": [
       "NET_MOVEL"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": false
   },
   {
     "categoria": "MOVEL",
@@ -297,7 +315,9 @@
     ],
     "abas": [
       "MOVEL"
-    ]
+    ],
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "MOVEL",
@@ -315,8 +335,8 @@
     "minutos": "5000",
     "sms": "5000",
     "fidelizacao_meses": 0,
-    "mensalidade_base": 5,
-    "mensalidade_promo": 5,
+    "mensalidade_base": 7,
+    "mensalidade_promo": 7,
     "meses_promo": 0,
     "custo_instalacao": 0,
     "oferta_voucher": 0,
@@ -327,7 +347,9 @@
     ],
     "abas": [
       "MOVEL"
-    ]
+    ],
+    "data_limite_adesao": "2026-11-30",
+    "ativo": true
   },
   {
     "categoria": "MOVEL",
@@ -356,7 +378,9 @@
     "mensalidade_promo": 9,
     "meses_promo": 0,
     "custo_instalacao": 0,
-    "oferta_voucher": 0
+    "oferta_voucher": 0,
+    "data_limite_adesao": "",
+    "ativo": true
   },
   {
     "categoria": "MOVEL",
@@ -385,6 +409,8 @@
     "mensalidade_promo": 7,
     "meses_promo": 0,
     "custo_instalacao": 0,
-    "oferta_voucher": 0
+    "oferta_voucher": 0,
+    "data_limite_adesao": "",
+    "ativo": true
   }
 ]
