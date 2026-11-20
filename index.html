@@ -1393,7 +1393,7 @@
           ? ""
           : `<span class="tariff-feature">Fibra ${item.fibra_mbps >= 1000 ? (item.fibra_mbps === 10000 ? "10 Gbps" : "1 Gbps") : item.fibra_mbps + " Mbps"}</span>
              <span class="tariff-feature-muted">${item.tv_canais > 0 ? item.tv_canais + " canais TV" : "Sem TV"}</span>
-             <span class="tariff-feature-muted">${item.cartoes_moveis || 0} cartão${Number(item.cartoes_moveis) === 1 ? "" : "s"} móvel${dadosIlimitados(item) ? " · Ilimitado" : item.dados_gb > 0 ? " · " + item.dados_gb + " GB" : ""}</span>`;
+             <span class="tariff-feature-muted">${item.cartoes_moveis || 0} cartão${Number(item.cartoes_moveis) === 1 ? "" : "s"} móvel${Number(item.cartoes_moveis) === 1 ? "" : "s"}${dadosIlimitados(item) ? " · Ilimitado" : item.dados_gb > 0 ? " · " + item.dados_gb + " GB" : ""}</span>`;
         const fidelizacao = item.fidelizacao_meses == null
           ? "Não confirmada"
           : item.fidelizacao_meses === 0 ? "Sem fidelização" : item.fidelizacao_meses + " meses";
